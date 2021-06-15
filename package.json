@@ -1,0 +1,15 @@
+{
+  "name": "capstone-connection-api",
+  "version": "1.0.0",
+  "description": "## API methods",
+  "main": "config.js",
+  "scripts": {
+    "test": "jest",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
