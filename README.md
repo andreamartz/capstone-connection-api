@@ -2,7 +2,7 @@
 
 ## Database Schema
 
-![Database Schema](./static/Database-schema.png)
+![Database Schema](./static/database-schema.png)
 
 ## API methods
 
