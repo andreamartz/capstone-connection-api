@@ -1,5 +1,9 @@
 # Capstone Connection API
 
+## Database Schema
+
+![Database Schema](./static/Database-schema.png)
+
 ## API methods
 
 ### users
