@@ -46,7 +46,7 @@ const router = new express.Router();
  * Returns: 
  * { projects:
  *     [
- *         { id, name, creatorId, image, repoUrl, description, createdAt, lastModified }, 
+ *         { id, name, creatorId, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified }, 
  *           ... 
  *     ]
  * }
@@ -57,10 +57,8 @@ const router = new express.Router();
  */
 
 router.get('/', async function (req, res, next) {
-  const q = req.query;
-
   try {
-    const projects = await Project.getAll();
+    const projects = await Project.getAll(req.query);
     return res.json({ projects });
   } catch (err) {
     return next(err);
