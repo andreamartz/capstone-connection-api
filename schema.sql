@@ -20,7 +20,7 @@ CREATE TABLE projects (
   repo_url TEXT NOT NULL UNIQUE,
   site_url TEXT NOT NULL,
   description VARCHAR(500),
-  feedback_request VARCHAR(500),
+  feedback_request VARCHAR(5000),
   created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
   last_modified TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
