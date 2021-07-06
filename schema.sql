@@ -17,7 +17,7 @@ CREATE TABLE projects (
   name VARCHAR(100) NOT NULL UNIQUE,
   creator_id INTEGER REFERENCES users ON DELETE CASCADE,
   image TEXT DEFAULT './static/default-project-image-pixabay-dev-illustration.png',
-  repo_url TEXT NOT NULL,
+  repo_url TEXT NOT NULL UNIQUE,
   site_url TEXT NOT NULL,
   description VARCHAR(500),
   feedback_request VARCHAR(500),
