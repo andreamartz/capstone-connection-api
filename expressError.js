@@ -9,9 +9,13 @@ class ExpressError extends Error {
     super();
     this.message = message;
     this.status = status;
+    console.error(this.stack);
   }
 }
 
+/**
+ * Use the ExpressError class to create custom status codes and messages for each type of error we anticipate needing to handle.
+ */
 
 /** 400 BAD REQUEST error. */
 
