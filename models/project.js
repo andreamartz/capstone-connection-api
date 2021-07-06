@@ -1,5 +1,6 @@
 "use strict";
 
+const { cloudinary } = require('../utils/cloudinary');
 const _ = require('lodash');
 // const array = require('lodash/array');
 const db = require("../db");
@@ -32,16 +33,16 @@ class Project {
    *         feedbackRequest,
    *         createdAt, 
    *         lastModified,
-   *         likesCount,
-   *         commentsCount,
-   *         user: {
+   *         prjLikesCount,
+   *         prjCommentsCount,
+   *         creator: {
    *           firstName,
    *           lastName,
    *           photoUrl
    *         }
    *         tags: [
-   *           text,
-   *           text,
+   *           {tagId, tagText},
+   *           {...},
    *           ...
    *         ]
    *       },
@@ -70,9 +71,10 @@ class Project {
         u.first_name AS "firstName",
         u.last_name AS "lastName",
         u.photo_url AS "photoUrl",
+        t.id AS "tagId",
         t.text AS "tagText",
-        (SELECT COUNT(*) FROM project_likes AS pl WHERE p.id = pl.project_id) AS "projectLikesCount",
-        (SELECT COUNT(*) FROM project_comments AS pc WHERE p.id = pc.project_id) AS "projectCommentsCount"
+        (SELECT COUNT(*) FROM project_likes AS pl WHERE p.id = pl.project_id) AS "prjLikesCount",
+        (SELECT COUNT(*) FROM project_comments AS pc WHERE p.id = pc.project_id) AS "prjCommentsCount"
       FROM projects p
       LEFT JOIN users AS u
       ON p.creator_id = u.id
@@ -112,11 +114,11 @@ class Project {
       let prjRow = prjRows[prop].reduce((prj, data) => {
 
         // Destructure variables from data
-        const { name, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified, projectLikesCount, projectCommentsCount, firstName, lastName, photoUrl } = data;
+        const { name, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified, tagId, tagText, prjLikesCount, prjCommentsCount, firstName, lastName, photoUrl } = data;
 
         // The following code works but is not efficient since the values are overwritten on every iteration. 
         // QUESTION: Is there a better way?
-        prj = {...prj, name, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified, projectLikesCount: +projectLikesCount, projectCommentsCount: +projectCommentsCount};
+        prj = {...prj, name, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified, prjLikesCount: +prjLikesCount, prjCommentsCount: +prjCommentsCount};
 
         // Store project creator data in an object
         prj.creator = { 
@@ -126,7 +128,7 @@ class Project {
         };
 
         // Store project tags data in an array
-        prj.tags = [...prj.tags, data.tagText];
+        prj.tags = [...prj.tags, {tagId, tagText}];
 
         return prj;
       }, { id: +prop, 
@@ -138,8 +140,8 @@ class Project {
            feedbackRequest: "", 
            createdAt: "", 
            lastModified: "", 
-           projectLikesCount: null,
-           projectCommentsCount: null,
+           prjLikesCount: null,
+           prjCommentsCount: null,
            creator: {}, 
            tags: [] 
       });
@@ -321,22 +323,54 @@ class Project {
    * Returns:
    *   {
    *     project: {
-   *         id,
-   *         name,
-   *         creatorId,
-   *         image, 
-   *         repoUrl, 
-   *         siteUrl
-   *         description, 
-   *         feedbacRequest
-   *         createdAt, 
-   *         lastModified
-   *     }
+   *        id,
+   *        name,
+   *        creatorId,
+   *        image, 
+   *        repoUrl, 
+   *        siteUrl
+   *        description, 
+   *        feedbacRequest
+   *        createdAt, 
+   *        lastModified,
+   *        creator: {
+   *          firstName,
+   *          lastName,
+   *          photoUrl
+   *        }
+   *        tags: [
+   *          {tagId, tagText},
+   *          {...},
+   *          ...
+   *        ]
+   *     },
    *   }
-   * 
    * Error(s): 
    */
+  static async create(data) {
+    const result = await db.query(
+      `INSERT INTO projects (
+        name,
+        creator_id,
+        image,
+        repo_url,
+        site_url
+      )
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING id, name, image, repo_url AS "repoUrl", site_url AS "siteUrl"`,
+      [
+        data.name,
+        data.creatorId,
+        data.image,
+        data.repoUrl,
+        data.siteUrl
+      ]
+    );
+    
+    const project = result.rows[0];
 
+    return project;
+  }
 }
 
 module.exports = Project;
