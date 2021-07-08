@@ -1,8 +1,6 @@
 "use strict";
 
-const { cloudinary } = require('../utils/cloudinary');
 const _ = require('lodash');
-// const array = require('lodash/array');
 const db = require("../db");
 const {
   BadRequestError,
