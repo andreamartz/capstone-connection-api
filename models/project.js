@@ -34,6 +34,7 @@ class Project {
    *         prjLikesCount,
    *         prjCommentsCount,
    *         creator: {
+   *           creatorId,
    *           firstName,
    *           lastName,
    *           photoUrl
@@ -82,6 +83,9 @@ class Project {
       ON t.id = pt.tag_id
     `;
 
+    let whereExpressions = [];
+
+
     // let query2 = `
     //   SELECT 
     //     p.id,
@@ -92,7 +96,7 @@ class Project {
     //   ON p.id = pl.project_id
     //   GROUP BY p.id, pl.project_id
     // `;
-
+    // QUESTION: why is it not sorting on lastModified?
     query += " ORDER BY p.last_modified DESC";
 
     const results = await db.query(query);
@@ -112,14 +116,15 @@ class Project {
       let prjRow = prjRows[prop].reduce((prj, data) => {
 
         // Destructure variables from data
-        const { name, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified, tagId, tagText, prjLikesCount, prjCommentsCount, firstName, lastName, photoUrl } = data;
+        const { name, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified, tagId, tagText, prjLikesCount, prjCommentsCount, creatorId, firstName, lastName, photoUrl } = data;
 
-        // The following code works but is not efficient since the values are overwritten on every iteration. 
+        // The following code works but is not efficient since the values are overwritten on every iteration. (Same question for prj.creator below)
         // QUESTION: Is there a better way?
         prj = {...prj, name, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified, prjLikesCount: +prjLikesCount, prjCommentsCount: +prjCommentsCount};
-
+        
         // Store project creator data in an object
         prj.creator = { 
+          creatorId,
           firstName, 
           lastName, 
           photoUrl
