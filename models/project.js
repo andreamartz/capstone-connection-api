@@ -13,6 +13,64 @@ const { sqlForPartialUpdate } = require("../helpers/sql");
 /** Functions for projects */
 
 class Project {
+  /** Purpose: to create a project (from data), update database, return new project data
+   * 
+   * Input: { name, creatorId, image, repoUrl, description }
+   * 
+   * Returns:
+   *   {
+   *     project: {
+   *        id,
+   *        name,
+   *        creatorId,
+   *        image, 
+   *        repoUrl, 
+   *        siteUrl
+   *        description, 
+   *        feedbacRequest
+   *        createdAt, 
+   *        lastModified,
+   *        creator: {
+   *          firstName,
+   *          lastName,
+   *          photoUrl
+   *        }
+   *        tags: [
+   *          {tagId, tagText},
+   *          {...},
+   *          ...
+   *        ]
+   *     },
+   *   }
+   * Error(s): 
+   */
+
+   static async create(data) {
+    const result = await db.query(
+      `INSERT INTO projects (
+        name,
+        creator_id,
+        image,
+        repo_url,
+        site_url
+      )
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING id, name, image, repo_url AS "repoUrl", site_url AS "siteUrl"`,
+      [
+        data.name,
+        data.creatorId,
+        data.image,
+        data.repoUrl,
+        data.siteUrl
+      ]
+    );
+    
+    const project = result.rows[0];
+
+    return project;
+  }
+
+
   /** Purpose: get all projects 
    * 
    * Input: none
