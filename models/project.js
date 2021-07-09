@@ -251,83 +251,105 @@ class Project {
   *  Error(s): 
   */
 
-  // IN PROGRESS
   static async getOne(id) {
-    let query = `
+    const prjQuery = `
+      SELECT 
     SELECT 
-      p.id,
-      p.name,
-      p.creator_id AS "creatorId",
-      p.image,
-      c.comment
-    FROM projects p
-    LEFT JOIN comments AS c
-    ON u.id = p.creator_id
+      SELECT 
+        p.id AS id,
+        p.name AS name,
+        p.creator_id AS "creatorId",
+        p.image,
+        p.repo_url AS "repoUrl",
+        p.site_url AS "siteUrl",
+        p.description,
+        p.feedback_request AS "feedbackRequest",
+        p.created_at AS "createdAt",
+        p.last_modified AS "lastModified",
+        u.first_name AS "firstName",
+        u.last_name AS "lastName",
+        u.photo_url AS "photoUrl",
+        (SELECT COUNT(*) FROM project_likes AS pl WHERE p.id = pl.project_id) AS "prjLikesCount"
+      FROM projects p
+      LEFT JOIN users AS u
+      ON u.id = p.creator_id
+      WHERE p.id = $1
     `;
 
-    // query += " ORDER BY lastModified";
-    console.log("QUERY: ", query);
-    const results = await db.query(query);
-    console.log("RESULTS.ROWS: ", results.rows);
-
-    // console.log("RESULTS: ", results);
-    return results.rows;
-  }
-
-
-
-  /** Purpose: to create a project (from data), update database, return new project data
-   * 
-   * Input: { name, creatorId, image, repoUrl, description }
-   * 
-   * Returns:
-   *   {
-   *     project: {
-   *        id,
-   *        name,
-   *        creatorId,
-   *        image, 
-   *        repoUrl, 
-   *        siteUrl
-   *        description, 
-   *        feedbacRequest
-   *        createdAt, 
-   *        lastModified,
-   *        creator: {
-   *          firstName,
-   *          lastName,
-   *          photoUrl
-   *        }
-   *        tags: [
-   *          {tagId, tagText},
-   *          {...},
-   *          ...
-   *        ]
-   *     },
-   *   }
-   * Error(s): 
-   */
-  static async create(data) {
-    const result = await db.query(
-      `INSERT INTO projects (
-        name,
-        creator_id,
-        image,
-        repo_url,
-        site_url
-      )
-      VALUES ($1, $2, $3, $4, $5)
-      RETURNING id, name, image, repo_url AS "repoUrl", site_url AS "siteUrl"`,
-      [
-        data.name,
-        data.creatorId,
-        data.image,
-        data.repoUrl,
-        data.siteUrl
-      ]
-    );
+    const projectRes = await db.query(prjQuery, [id]);
+    let project = projectRes.rows[0];
     
-    const project = result.rows[0];
+    const { name, creatorId, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified, firstName, lastName, photoUrl, prjLikesCount } = project;
+
+    project = { id: +id, name, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified, prjLikesCount: +prjLikesCount };
+
+    const creator = { 
+      creatorId,
+      firstName,
+      lastName,
+      photoUrl
+    };
+    
+    project.creator = creator;
+    
+    // Verify project exists before continuing (& throw error if not)
+    if (!project) throw new NotFoundError(`No project: ${id} was found.`);
+
+    // Query to get project's tags
+    const projectsTagsQuery = `
+      SELECT 
+        pt.id,
+        pt.tag_id,
+        t.text
+      FROM projects_tags AS pt
+      LEFT JOIN tags AS t
+      ON t.id = pt.tag_id
+      WHERE project_id = $1
+      ORDER BY pt.id
+    `;
+
+    const projectsTagsRes = await db.query(projectsTagsQuery, [id]);
+
+    project.tags = projectsTagsRes.rows;
+
+    
+    // Query to get project's comments
+    const commentsQuery = `
+      SELECT 
+        pc.id,
+        pc.commenter_id AS "commenterId",
+        pc.comment,
+        pc.created_at AS "createdAt",
+        pc.last_modified AS "lastModified",
+        u.first_name AS "firstName",
+        u.last_name AS "lastName",
+        u.photo_url AS "photoUrl"
+      FROM project_comments AS pc
+      LEFT JOIN users AS u
+      ON u.id = pc.commenter_id
+      WHERE pc.project_id = $1
+      ORDER BY pc.created_at DESC
+      `;
+    
+      const commentsRes = await db.query(commentsQuery, [id]);
+      const comments = commentsRes.rows.map(c => (
+        {
+          id: c.id,
+          comment: c.comment,
+          commentCreatedAt: c.commentCreatedAt,
+          commentLastModified: c.commentLastModified,
+          commenter: {
+            id: c.commenterId,
+            firstName: c.firstName,
+            lastName: c.lastName,
+            photoUrl: c.photoUrl
+          }
+        }
+      ));
+
+      project.comments = comments;
+
+      console.log("PROJECT: ", project);
 
     return project;
   }
