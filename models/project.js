@@ -92,13 +92,13 @@ class Project {
    *         prjLikesCount,
    *         prjCommentsCount,
    *         creator: {
-   *           creatorId,
+   *           id,
    *           firstName,
    *           lastName,
    *           photoUrl
    *         }
    *         tags: [
-   *           {tagId, tagText},
+   *           {id, text},
    *           {...},
    *           ...
    *         ]
@@ -171,14 +171,14 @@ class Project {
         
         // Store project creator data in an object
         prj.creator = { 
-          creatorId,
+          id: creatorId,
           firstName, 
           lastName, 
           photoUrl
         };
 
         // Store project tags data in an array
-        prj.tags = [...prj.tags, {tagId, tagText}];
+        prj.tags = [...prj.tags, {id: tagId, text: tagText}];
 
         return prj;
       }, { id: +prop, 
