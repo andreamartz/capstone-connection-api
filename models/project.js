@@ -144,25 +144,14 @@ class Project {
     let whereExpressions = [];
 
 
-    // let query2 = `
-    //   SELECT 
-    //     p.id,
-    //     pl.project_id, 
-    //     COUNT(*) AS "likesCount"
-    //   FROM project_likes AS pl
-    //   LEFT JOIN projects AS p
-    //   ON p.id = pl.project_id
-    //   GROUP BY p.id, pl.project_id
-    // `;
     // QUESTION: why is it not sorting on lastModified?
     query += " ORDER BY p.last_modified DESC";
 
     const results = await db.query(query);
-    console.log("RESULTS.ROWS: ", results.rows);
 
     // Reduce duplication by grouping results data by project id
     let prjRows = _.groupBy(results.rows, row => row.id);
-    console.log("PRJROWS: ", prjRows);
+
 
     // Create (empty) projects array to push project data into
     let projects = [];
@@ -211,96 +200,6 @@ class Project {
 
     return projects;
   }
-
-  
-
-
-  // TESTING: gets an array of comments for each project
-  static async getAll2() {
-    let query = `
-      SELECT 
-        p.id,
-        p.name,
-        p.creator_id AS "creatorId",
-        p.image,
-        c.id AS "commentId",
-        c.comment
-      FROM projects p
-      LEFT JOIN project_comments AS c
-      ON c.project_id = p.id
-    `;
-
-
-    // query += " ORDER BY lastModified";
-    const results = await db.query(query);
-    console.log("RESULTS.ROWS: ", results.rows);
-    let prjRows = _.groupBy(results.rows, row => row.id);
-    console.log("PRJROWS: ", prjRows);
-    // let testing = { projects: [] };
-    let projects = [];
-    console.log("PROJECTS: ", projects);
-
-    for (let prop in prjRows) {
-      console.log("PROP: ", prop);
-      let new_prj_row = prjRows[prop].reduce((prj, data) => {
-        console.log("PRJ: ", prj, "DATA: ", data);
-        prj.comments = [...prj.comments, data.comment]
-        return prj;
-      }, { id: +prop, comments: [] });
-      projects.push(new_prj_row);
-    };
-
-    console.log("PROJECTS: ", projects);
-
-    return projects;
-  }
-
-  // TESTING: Duplicate output happens when I do two LEFT JOINS on the same field (p.id)
-  static async getAll3() {
-    let query = `
-      SELECT 
-        p.id,
-        p.name,
-        p.creator_id AS "creatorId",
-        p.image,
-        c.id AS "commentId",
-        c.comment,
-        pt.tag_id AS "tagId"
-      FROM projects p
-      LEFT JOIN project_comments AS c
-      ON c.project_id = p.id
-      LEFT JOIN projects_tags AS pt
-      ON pt.project_id = p.id
-      GROUP BY p.id, c.id, pt.id
-    `;
-
-
-    // query += " ORDER BY lastModified";
-    const results = await db.query(query);
-    console.log("RESULTS.ROWS: ", results.rows);
-    let prjRows = _.groupBy(results.rows, row => row.id);
-    console.log("PRJROWS: ", prjRows);
-    // let testing = { projects: [] };
-    let projects = [];
-    // console.log("PROJECTS: ", projects);
-
-    for (let prop in prjRows) {
-      // console.log("PROP: ", prop);
-      let new_prj_row = prjRows[prop].reduce((prj, data) => {
-        // console.log("PRJ: ", prj, "DATA: ", data);
-        prj.comments = [...prj.comments, data.comment]
-        return prj;
-      }, { id: +prop, comments: [] });
-      projects.push(new_prj_row);
-    };
-
-    console.log("PROJECTS: ", projects);
-
-    return projects;
-  }
-
-
-
 
   /** Purpose: get a project by id
   * 
