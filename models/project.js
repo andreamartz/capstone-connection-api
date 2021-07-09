@@ -210,7 +210,6 @@ class Project {
   *     project: {
   *       id,
   *       name,
-  *       creatorId,
   *       image, 
   *       repoUrl, 
   *       siteUrl,
@@ -219,23 +218,25 @@ class Project {
   *       createdAt, 
   *       lastModified,
   *       user: {
+  *         creatorId,
   *         firstName,
   *         lastName,
   *         photoUrl
   *       },
   *       projectLikesCount,
   *       tags: [
-  *         text,
-  *         text,
+  *         { id, text },
   *         ...
   *       ]
   *       comments: [
   *         {
   *           id,
   *           comment,
-  *           lastModified,
+  *           commentCreatedAt,
+  *           commentLastModified,
   *           commentLikesCount,
   *           user: {
+  *             commenter_id,
   *             firstName,
   *             lastName,
   *             photoUrl
@@ -253,8 +254,6 @@ class Project {
 
   static async getOne(id) {
     const prjQuery = `
-      SELECT 
-    SELECT 
       SELECT 
         p.id AS id,
         p.name AS name,
@@ -298,8 +297,7 @@ class Project {
     // Query to get project's tags
     const projectsTagsQuery = `
       SELECT 
-        pt.id,
-        pt.tag_id,
+        pt.tag_id AS "id",
         t.text
       FROM projects_tags AS pt
       LEFT JOIN tags AS t
