@@ -17,13 +17,11 @@ const Project = require("../models/project");
 
 const router = new express.Router();
 
-/** POST /projects/new { project }
+/** POST /projects/new
  * 
  * Purpose: create a new project and save to database
  * 
- * Params:
- * 
- * Req body: 
+ * Req body:  { project }
  * 
  * Returns: 
  * 
@@ -36,32 +34,17 @@ router.post("/new", async function (req, res, next) {
     // console.log("BACKEND DATA SENT: ", req.body.data);
     console.log("BACKEND REQ.BODY: ", req.body);
 
-    const fileStr = req.body.image;  // the string representation of the image coming from the frontend
-    
+    const fileStr = req.body.image;  
+    // upload image to Cloudinary
     const imageData = await imageUpload(fileStr);
+    
     const image = imageData.secure_url;
     console.log("IMAGE AFTER UPLOAD: ", image);
     req.body.image = image;
-    
     console.log("REQ.BODY: ", req.body);
-    // console.log("REQ.BODY: ", req.body);
-    // // console.log("FILESTR: ", fileStr);
-
-    // const uploadResponse = await cloudinary.uploader.upload(fileStr, {
-    //   upload_preset: 'capstone_connections',
-    // });
-    // console.log("UPLOADRESPONSE: ", uploadResponse);
-    // res.json({ msg: 'yaya' });
-    
     const project = await Project.create(req.body);
     return res.status(201).json({ project });
-    
-
-
-
   } catch (err) {
-    // console.error(err);
-    // res.status(500).json({ err: 'Something went wrong' });
     return next(err);
   }
 });
