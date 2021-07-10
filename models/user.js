@@ -159,7 +159,25 @@ class User {
   //   const user = result.rows[0];
 
   //   return user;
-  // }
+  /** Get a specific user by username */
+  static async get(username) {
+    const query = `
+      SELECT username,
+        
+    `
+    const userRes = await db.query(query, [username]);
+    const user = userRes.rows[0];
+    if (!user) throw new NotFoundError(`No user with ${username} was found.`);
+
+    return user;
+  }
+
+  /** Update user data with `data` */
+  static async update(username, data) {
+
+  }
+
+
 
 }
 
