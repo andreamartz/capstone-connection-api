@@ -94,6 +94,26 @@ router.get('/:id', async function (req, res, next) {
   }
 });
 
+/** PATCH /:id
+ * 
+ * Purpose: update a specific project by id
+ * 
+ * Req body: 
+ * 
+ * Returns: 
+ * 
+ * Auth required: 
+ * 
+ * Errors: 
+*/
+router.patch("/:id", async function(req, res, next) {
+  try {
+    const project = await Project.update(req.params.id, req.body);
+    return res.json({ project });
+  } catch (err) {
+    return next(err);
+  }
+});
 
 
 module.exports = router;
