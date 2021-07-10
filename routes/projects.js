@@ -9,7 +9,9 @@ const { BadRequestError } = require("../expressError");
 const { ensureAdmin } = require("../middleware/auth");
 const imageUpload = require("../helpers/imageUpload");
 const Project = require("../models/project");
-const { cloudinary } = require('../utils/cloudinary');
+// const { cloudinary } = require('../utils/cloudinary');
+
+
 // Data validation schemas
 
 
