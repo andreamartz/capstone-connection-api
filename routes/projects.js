@@ -115,5 +115,25 @@ router.patch("/:id", async function(req, res, next) {
   }
 });
 
+/** DELETE /:id 
+ * 
+ * Purpose: retrieve a specific project by id
+ * 
+ * Req body: none
+ * 
+ * Returns: { deleted: id }
+ * 
+ * Auth required: 
+ * 
+ * Errors: 
+*/
+router.delete("/:id", async function(req, res, next) {
+  try {
+    await Project.remove(req.params.handle);
+    return res.json({ deleted: req.params.id });
+  } catch (err) {
+    return next(err);
+  }
+});
 
 module.exports = router;
