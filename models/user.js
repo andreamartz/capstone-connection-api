@@ -179,6 +179,39 @@ class User {
 
 
 
+  /** Purpose: to remove a user 
+   * 
+   * Inputs: username
+   * 
+   * Returns: 
+   *   {
+   *     user: 
+   *       {
+   *         username,
+   *         firstName,
+   *         lastName, 
+   *         bio, 
+   *         photoUrl, 
+   *         portfolioUrl, 
+   *         githubUrl,
+   *         isAdmin
+   *       }
+   *   }
+   * 
+   * Errors: Throws UnauthorizedError if user is not found or password is wrong
+  */
+  static async remove(username) {
+    const query = `
+      DELETE
+      FROM users
+      WHERE id = $1
+      RETURNING id
+    `;
+    const result = await db.query(query, [username]);
+    const user = result.rows[0];
+
+    if (!user) throw new NotFoundError(`No user with username ${username} was found.`);
+  }
 }
 
 
