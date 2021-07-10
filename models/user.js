@@ -159,6 +159,8 @@ class User {
   //   const user = result.rows[0];
 
   //   return user;
+  }
+
   /** Get a specific user by username */
   static async get(username) {
     const query = `
