@@ -11,6 +11,7 @@ const authRoutes = require("./routes/auth");
 const usersRoutes = require("./routes/users");
 const projectsRoutes = require("./routes/projects");
 // const tagsRoutes = require("./routes/tags");
+const projectLikesRoutes = require("./routes/project_likes");
 
 const morgan = require("morgan");
 
@@ -26,8 +27,7 @@ app.use("/auth", authRoutes);
 app.use("/users", usersRoutes);
 app.use("/projects", projectsRoutes);
 // app.use("/tags", tagsRoutes);
-
-
+app.use("/project_likes", projectLikesRoutes);
 
 
 /** 404 error handler (matches everything) */
@@ -38,6 +38,7 @@ app.use(function (req, res, next) {
 /** Generic error handler; anything unhandled goes here. */
 app.use(function (err, req, res, next) {
   if (process.env.NODE_ENV !== "test") console.error(err.stack);
+  
   const status = err.status || 500;
   const message = err.message;
 
