@@ -72,5 +72,28 @@ router.get('/', async function (req, res, next) {
   }
 });
 
+/** GET /:id  =>  { project } 
+ * 
+ * Purpose: retrieve a specific project by id
+ * 
+ * Req body: none
+ * 
+ * Returns: 
+ * 
+ * Auth required: 
+ * 
+ * Errors: 
+*/
+
+router.get('/:id', async function (req, res, next) {
+  try {
+    const project = await Project.getOne(req.params.id);
+    return res.json({ project });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+
 
 module.exports = router;
