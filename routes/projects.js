@@ -50,23 +50,13 @@ router.post("/new", async function (req, res, next) {
 });
 
 
-
-
 /** GET / 
  * 
  * Purpose: retrieve all projects from the database
  * 
- * Params: none 
- * 
  * Req body: none
  * 
  * Returns: 
- * { projects:
- *     [
- *         { id, name, creatorId, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified }, 
- *           ... 
- *     ]
- * }
  * 
  * Auth required: 
  * 
