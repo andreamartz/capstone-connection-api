@@ -49,19 +49,23 @@ class Project {
     const result = await db.query(
       `INSERT INTO projects (
         name,
+        description,
         creator_id,
         image,
         repo_url,
-        site_url
+        site_url,
+        feedback_request
       )
-      VALUES ($1, $2, $3, $4, $5)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING id, name, image, repo_url AS "repoUrl", site_url AS "siteUrl"`,
       [
         data.name,
+        data.description,
         data.creatorId,
         data.image,
         data.repoUrl,
-        data.siteUrl
+        data.siteUrl,
+        data.feedbackRequest
       ]
     );
     
