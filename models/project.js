@@ -69,10 +69,6 @@ class Project {
       ]
     );
 
-    // After project is returned with id, map through the tag ids and add each one using the projects_tags table
-
-    
-    
     const project = result.rows[0];
     // console.log("PROJECT: ", project);
 
