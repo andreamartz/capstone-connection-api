@@ -30,19 +30,24 @@ const router = new express.Router();
  * Errors: 
  */
 router.post("/new", async function (req, res, next) {
+  console.debug("CREATE NEW PRJ");
   try {
-    // console.log("BACKEND DATA SENT: ", req.body.data);
-    console.log("BACKEND REQ.BODY: ", req.body);
-
     const fileStr = req.body.image;  
     // upload image to Cloudinary
+    // console.log("IMAGE BEFORE UPLOAD", fileStr.substr(0, 40));
     const imageData = await imageUpload(fileStr);
-    
+
     const image = imageData.secure_url;
-    console.log("IMAGE AFTER UPLOAD: ", image);
+    // console.log("IMAGE AFTER UPLOAD");
     req.body.image = image;
     console.log("REQ.BODY: ", req.body);
+    
     const project = await Project.create(req.body);
+    console.log("PROJECT BEFORE ADDING TAGS: ", project);
+
+    const prjTags = await Project_Tag.create(project.id, req.body.tags);
+    project.tags=prjTags;
+
     return res.status(201).json({ project });
   } catch (err) {
     return next(err);
