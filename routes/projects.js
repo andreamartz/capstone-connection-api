@@ -56,6 +56,10 @@ router.post("/new", async function (req, res, next) {
  * 
  * Req body: none
  * 
+ * Can filter on provided filters (in req.query)
+ *  - username
+ *  - tag
+ * 
  * Returns: 
  * 
  * Auth required: 
