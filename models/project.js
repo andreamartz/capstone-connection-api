@@ -57,7 +57,7 @@ class Project {
         feedback_request
       )
       VALUES ($1, $2, $3, $4, $5, $6, $7)
-      RETURNING id, name, image, repo_url AS "repoUrl", site_url AS "siteUrl"`,
+      RETURNING id, name, image, repo_url AS "repoUrl", site_url AS "siteUrl", created_at AS "createdAt", last_modified AS "lastModified"`,
       [
         data.name,
         data.description,
@@ -68,8 +68,13 @@ class Project {
         data.feedbackRequest
       ]
     );
+
+    // After project is returned with id, map through the tag ids and add each one using the projects_tags table
+
+    
     
     const project = result.rows[0];
+    // console.log("PROJECT: ", project);
 
     return project;
   }
@@ -116,7 +121,7 @@ class Project {
    * Error(s): 
    */
 
-  static async getAll() {
+  static async getAll(filterParams = {}) {
     let query = `
       SELECT 
         p.id,
@@ -144,37 +149,61 @@ class Project {
       LEFT JOIN tags AS t
       ON t.id = pt.tag_id
     `;
+    
+    const whereExpressions = [];
+    const queryValues = [];
 
-    let whereExpressions = [];
+    const { username, tagText } = filterParams;
 
+    // CHECK: TODO Fix this to be parameterized queries
+
+    if (username) {
+      queryValues.push(username);
+      whereExpressions.push(`u.username = $${queryValues.length}`);
+      console.log("QUERY VALUES: ", queryValues);
+      console.log("WHERE EXPRESSIONS: ", whereExpressions);
+    };
+
+    if (tagText) {
+      queryValues.push(tagText);
+      whereExpressions.push(`t.text = ${queryValues.length}`);
+    };
+
+    
+    if (whereExpressions.length) {
+      query += " WHERE " + whereExpressions.join(' AND ');
+    }
 
     // QUESTION: why is it not sorting on lastModified?
-    query += " ORDER BY p.last_modified DESC";
+    query += " ORDER BY p.id DESC";
+    console.log("QUERY: ", query);
 
     const results = await db.query(query);
 
-    // Reduce duplication by grouping results data by project id
+    // Group results data by project id
     let prjRows = _.groupBy(results.rows, row => row.id);
 
 
     // Create (empty) projects array to push project data into
     let projects = [];
 
-
+    // console.log("PRJROWS: ", prjRows);
     // For loop takes result data grouped by project id and removes duplicate information to create an array of projects
     // QUESTION: This is essentially a nested loop (array reduce method used inside of for loop). Is there a better way?
     for (let prop in prjRows) {
-      let prjRow = prjRows[prop].reduce((prj, data) => {
+      let prjRow = prjRows[prop].reduce((accumulator, data) => {
+        // console.log("DATA: ", data);
+        // console.log("ACCUMULATOR: ", accumulator);
 
         // Destructure variables from data
-        const { name, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified, tagId, tagText, prjLikesCount, prjCommentsCount, creatorId, firstName, lastName, photoUrl } = data;
+        const { id, name, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified, tagId, tagText, prjLikesCount, prjCommentsCount, creatorId, firstName, lastName, photoUrl } = data;
 
         // The following code works but is not efficient since the values are overwritten on every iteration. (Same question for prj.creator below)
-        // QUESTION: Is there a better way?
-        prj = {...prj, name, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified, prjLikesCount: +prjLikesCount, prjCommentsCount: +prjCommentsCount};
+        // CHECK: QUESTION: Is there a better way?
+        const newRecord = {id, name, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified, prjLikesCount: +prjLikesCount, prjCommentsCount: +prjCommentsCount};
         
         // Store project creator data in an object
-        prj.creator = { 
+        newRecord.creator = { 
           id: creatorId,
           firstName, 
           lastName, 
@@ -182,9 +211,11 @@ class Project {
         };
 
         // Store project tags data in an array
-        prj.tags = [...prj.tags, {id: tagId, text: tagText}];
-
-        return prj;
+        if (tagId) {
+          newRecord.tags = [...accumulator.tags, {id: tagId, text: tagText}];
+        }
+        
+        return newRecord;
       }, { id: +prop, 
            name: "",
            image: "", 
@@ -199,9 +230,10 @@ class Project {
            creator: {}, 
            tags: [] 
       });
+      
       projects.push(prjRow);
     };
-
+    // console.log("PROJECT[0]: ", JSON.stringify(projects[0]), null, 4);
     return projects;
   }
 
@@ -221,17 +253,17 @@ class Project {
   *       feedbackRequest,
   *       createdAt, 
   *       lastModified,
-  *       user: {
+  *       creator: {
   *         creatorId,
   *         firstName,
   *         lastName,
   *         photoUrl
   *       },
-  *       projectLikesCount,
+  *       prjLikesCount,
   *       tags: [
   *         { id, text },
   *         ...
-  *       ]
+  *       ], 
   *       comments: [
   *         {
   *           id,
@@ -239,8 +271,8 @@ class Project {
   *           commentCreatedAt,
   *           commentLastModified,
   *           commentLikesCount,
-  *           user: {
-  *             commenter_id,
+  *           commenter: {
+  *             commenterId,
   *             firstName,
   *             lastName,
   *             photoUrl
@@ -281,6 +313,8 @@ class Project {
 
     const projectRes = await db.query(prjQuery, [id]);
     let project = projectRes.rows[0];
+    // Verify project exists before continuing (& throw error if not)
+    if (!project) throw new NotFoundError(`No project ${id} was found.`);
     
     const { name, creatorId, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified, firstName, lastName, photoUrl, prjLikesCount } = project;
 
@@ -296,7 +330,7 @@ class Project {
     project.creator = creator;
     
     // Verify project exists before continuing (& throw error if not)
-    if (!project) throw new NotFoundError(`No project: ${id} was found.`);
+    if (!project) throw new NotFoundError(`No project ${id} was found.`);
 
     // Query to get project's tags
     const projectsTagsQuery = `
@@ -355,7 +389,23 @@ class Project {
 
     return project;
   }
-}
+
+ /** Purpose: update a project with `data`
+  * 
+  * Input: 
+  * 
+  * Returns:
+  *   {
+  *     project: {
+  *     } 
+  *   }
+  *  
+  *  Error(s): 
+  */
+
+  static async update(id, data) {
+    
+  }
 
    /** Purpose: delete a project
   * 
