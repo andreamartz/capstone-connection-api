@@ -37,7 +37,7 @@ class Tag {
       FROM tags
     `;
     const tagsRes = await db.query(query);
-    const tags = tagsRes.rows[0];
+    const tags = tagsRes.rows;
     console.log("tags: ", tags);
 
     return tags;
