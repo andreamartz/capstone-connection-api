@@ -161,15 +161,94 @@ class User {
   //   return user;
   }
 
-  /** Get a specific user by username */
-  static async get(username) {
+
+
+  /** Purpose: Get a specific user by username 
+   * 
+   * Inputs: none
+   * 
+   * Returns: 
+   *   {
+   *     user: 
+   *       {
+   *         username,
+   *         firstName,
+   *         lastName, 
+   *         bio, 
+   *         photoUrl, 
+   *         portfolioUrl, 
+   *         gitHubUrl,
+   *         isAdmin
+   *       }
+   *   }
+   * 
+   * Errors: Throws UnauthorizedError if user is not found or password is wrong
+  */
+
+  static async getOne(username) {
+    const queryUsername = `
+      SELECT
+        id,
+        username
+      FROM users
+      WHERE username = $1
+    `;
+
+    const usernameRes = await db.query(queryUsername, [username]);
+    // console.log("USERNAMERES: ", usernameRes);
+    const userId = usernameRes.rows[0].id;
+    console.log("USERNAMERES.ROWS[0].id: ", userId);
+    if (!userId) throw new NotFoundError(`No user with ${username} was found.`);
+
+    
     const query = `
-      SELECT username,
-        
-    `
-    const userRes = await db.query(query, [username]);
-    const user = userRes.rows[0];
-    if (!user) throw new NotFoundError(`No user with ${username} was found.`);
+      SELECT 
+        u.id,
+        u.username,
+        u.first_name AS "firstName",
+        u.last_name AS "lastName",
+        u.bio,
+        u.photo_url AS "photoUrl",
+        u.portfolio_url AS "portfolioUrl",
+        u.github_url AS "gitHubUrl",
+        p.id AS "projectId",
+        p.name AS name,
+        p.creator_id AS "creatorId",
+        p.image,
+        p.repo_url AS "repoUrl",
+        p.site_url AS "siteUrl",
+        p.description,
+        p.feedback_request AS "feedbackRequest",
+        p.created_at AS "createdAt",
+        p.last_modified AS "lastModified"
+      FROM users u
+      LEFT JOIN projects AS p
+      ON u.id = p.creator_id
+      WHERE u.id = $1    
+    `;
+
+    const userResults = await db.query(query, [userId]);
+    console.log("USERRESULTS.ROWS: ", userResults.rows);
+
+    const projects = [];
+
+    for (let i = 0; i < userResults.rows.length; i++) {
+      const { projectId, name, creatorId, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified } = userResults.rows[i];
+
+      let project = { projectId, name, creatorId, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified };
+
+      projects.push(project);
+    }
+
+    const { id, firstName, lastName, bio, photoUrl, portfolioUrl, gitHubUrl } = userResults.rows[0];
+
+    const user = { id, username, firstName, lastName, bio, photoUrl, portfolioUrl, gitHubUrl };
+
+    user.projects = projects
+
+    // Verify user exists before continuing (& throw error if not)
+
+    // if (!user) throw new NotFoundError(`No user with id ${userId} was found.`);
 
     return user;
   }
