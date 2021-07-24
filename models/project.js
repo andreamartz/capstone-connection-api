@@ -101,12 +101,14 @@ class Project {
    *           firstName,
    *           lastName,
    *           photoUrl
-   *         }
+   *         },
    *         tags: [
    *           {id, text},
    *           {...},
    *           ...
-   *         ]
+   *         ],
+   *         currentUsersLikeId,
+   *         likesCount
    *       },
    *       {
    *       ...
@@ -135,7 +137,8 @@ class Project {
         u.photo_url AS "photoUrl",
         t.id AS "tagId",
         t.text AS "tagText",
-        (SELECT COUNT(*) FROM project_likes AS pl WHERE p.id = pl.project_id) AS "prjLikesCount",
+        pl.id AS "likeId",
+        pl.liker_id AS "likerUserId",
         (SELECT COUNT(*) FROM project_comments AS pc WHERE p.id = pc.project_id) AS "prjCommentsCount"
       FROM projects p
       LEFT JOIN users AS u
@@ -144,14 +147,20 @@ class Project {
       ON pt.project_id = p.id
       LEFT JOIN tags AS t
       ON t.id = pt.tag_id
+      LEFT JOIN project_likes AS pl
+      ON pl.project_id = p.id
     `;
     
+    // pl.id AS "likeId",
+    // pl.liker_id AS "likerId",
+    // pl.project_id AS "likeProjectId",
+
+    // (SELECT COUNT(*) FROM project_likes AS pl WHERE p.id = pl.project_id) AS "prjLikesCount",
+
     const whereExpressions = [];
     const queryValues = [];
 
     const { username, tagText } = filterParams;
-
-    // CHECK: TODO Fix this to be parameterized queries
 
     if (username) {
       queryValues.push(username);
@@ -162,7 +171,7 @@ class Project {
 
     if (tagText) {
       queryValues.push(tagText);
-      whereExpressions.push(`t.text = ${queryValues.length}`);
+      whereExpressions.push(`t.text = $${queryValues.length}`);
     };
 
     
@@ -170,33 +179,29 @@ class Project {
       query += " WHERE " + whereExpressions.join(' AND ');
     }
 
-    // QUESTION: why is it not sorting on lastModified?
+    // CHECK: QUESTION: why is it not sorting on lastModified?
     query += " ORDER BY p.id DESC";
-    console.log("QUERY: ", query);
+    console.log("QUERY: ", query, "QUERY VALUES: ", queryValues);
 
-    const results = await db.query(query);
+    const results = await db.query(query, queryValues);
+    // console.log("RESULTS: ", results);
 
     // Group results data by project id
     let prjRows = _.groupBy(results.rows, row => row.id);
-
-
+  
     // Create (empty) projects array to push project data into
     let projects = [];
 
-    // console.log("PRJROWS: ", prjRows);
+    console.log("PRJROWS: ", prjRows);
     // For loop takes result data grouped by project id and removes duplicate information to create an array of projects
     // QUESTION: This is essentially a nested loop (array reduce method used inside of for loop). Is there a better way?
     for (let prop in prjRows) {
       let prjRow = prjRows[prop].reduce((accumulator, data) => {
-        // console.log("DATA: ", data);
-        // console.log("ACCUMULATOR: ", accumulator);
-
-        // Destructure variables from data
-        const { id, name, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified, tagId, tagText, prjLikesCount, prjCommentsCount, creatorId, firstName, lastName, photoUrl } = data;
+        const { id, name, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified, tagId, tagText, likeId, likerUserId, prjCommentsCount, creatorId, firstName, lastName, photoUrl } = data;
 
         // The following code works but is not efficient since the values are overwritten on every iteration. (Same question for prj.creator below)
         // CHECK: QUESTION: Is there a better way?
-        const newRecord = {id, name, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified, prjLikesCount: +prjLikesCount, prjCommentsCount: +prjCommentsCount};
+        const newRecord = {id, name, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified, prjCommentsCount: +prjCommentsCount};
         
         // Store project creator data in an object
         newRecord.creator = { 
@@ -210,6 +215,17 @@ class Project {
         if (tagId) {
           newRecord.tags = [...accumulator.tags, {id: tagId, text: tagText}];
         }
+
+        if (likeId) {
+          newRecord.likes = [...accumulator.likes, {likeId, likerUserId}];
+        }
+
+        // if (likeId) newRecord.likeId = likeId;
+        // if (likerId) newRecord.likerId = likerId;
+
+        // if (likeId) {
+        //   newRecord.likes = [...accumulator.likes, { likeId, likerId}]
+        // }
         
         return newRecord;
       }, { id: +prop, 
@@ -221,15 +237,52 @@ class Project {
            feedbackRequest: "", 
            createdAt: "", 
            lastModified: "", 
-           prjLikesCount: null,
            prjCommentsCount: null,
            creator: {}, 
-           tags: [] 
+           tags: [],
+           likes: []
       });
       
       projects.push(prjRow);
     };
-    // console.log("PROJECT[0]: ", JSON.stringify(projects[0]), null, 4);
+
+    // let prjRows = _.groupBy(results.rows, row => row.id);
+    for (const project of projects) {
+      if (project.id === 1) {
+        console.log("PROJECT: ", project);
+      }
+
+      const uniqTags = _.uniqBy(project.tags, function(tag){
+        return tag.id;
+      });
+
+      project.tags = uniqTags;
+
+      const uniqLikes = _.uniqBy(project.likes, function(like) {
+        return like.likeId;
+      });
+
+      // project.likes = uniqLikes;
+
+      if (project.id === 1) {
+        console.log("PROJECT 1 UNIQLIKES: ", uniqLikes);
+      }
+
+      project.likesCount = uniqLikes.length;
+
+      delete project.likes;
+      
+      // CHECK: remove hard-coded user once we have auth
+      const currentUserId = 3;
+
+      const likedByCurrentUser = uniqLikes.find(like => like.likerUserId === currentUserId);
+      
+
+      project.currentUsersLikeId = likedByCurrentUser ? likedByCurrentUser.likeId : null;
+    }
+
+    console.log("PROJECTS with new like data: ", projects);
+
     return projects;
   }
 
@@ -255,11 +308,12 @@ class Project {
   *         lastName,
   *         photoUrl
   *       },
-  *       prjLikesCount,
   *       tags: [
   *         { id, text },
   *         ...
-  *       ], 
+  *       ],
+  *       likesCount, 
+  *       currentUsersLikeId,
   *       comments: [
   *         {
   *           id,
@@ -300,31 +354,88 @@ class Project {
         u.first_name AS "firstName",
         u.last_name AS "lastName",
         u.photo_url AS "photoUrl",
-        (SELECT COUNT(*) FROM project_likes AS pl WHERE p.id = pl.project_id) AS "prjLikesCount"
+        pl.id AS "likeId",
+        pl.liker_id AS "likerUserId"
       FROM projects p
       LEFT JOIN users AS u
       ON u.id = p.creator_id
+      LEFT JOIN project_likes AS pl
+      ON pl.project_id = p.id
       WHERE p.id = $1
     `;
 
+    // (SELECT COUNT(*) FROM project_likes AS pl WHERE p.id = pl.project_id) AS "likesCount"
+
     const projectRes = await db.query(prjQuery, [id]);
-    let project = projectRes.rows[0];
+    console.log("PROJECTRES.ROWS: ", projectRes.rows);
+    let projectRows = projectRes.rows;
     // Verify project exists before continuing (& throw error if not)
-    if (!project) throw new NotFoundError(`No project ${id} was found.`);
+    if (!projectRows) throw new NotFoundError(`No project ${id} was found.`);
     
-    const { name, creatorId, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified, firstName, lastName, photoUrl, prjLikesCount } = project;
 
-    project = { id: +id, name, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified, prjLikesCount: +prjLikesCount };
+    const project = projectRows.reduce((accumulator, data) => {
+      const { id, name, creatorId, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified, firstName, lastName, photoUrl, likeId, likerUserId } = data;
 
-    const creator = { 
-      creatorId,
-      firstName,
-      lastName,
-      photoUrl
-    };
+      const newRecord = {id, name, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified 
+      };
+
+      newRecord.creator = { ...accumulator.creator, 
+        id: creatorId,
+        firstName,
+        lastName,
+        photoUrl
+      };
+
+      if (likeId) {
+        newRecord.likes = [...accumulator.likes, {likeId, likerUserId}];
+      } else {
+        newRecord.likes = [...accumulator.likes]
+      }
+      
+      return newRecord;
+    }, { id,
+      name: "",
+      image: "",
+      repoUrl: "",
+      siteUrl: "",
+      description: "",
+      feedbackRequest: "",
+      createdAt: "",
+      lastModified: "",
+      creator: {},
+      likes: []
+    });
+
+    console.log("PROJECT: ", project);
     
-    project.creator = creator;
+    project.likesCount = project.likes.length;
+
+    // CHECK: remove hard-coded user once we have auth
+    const currentUserId = 3;    
+
+    const likedByCurrentUser = project.likes.find(like => like.likerUserId === currentUserId);
+
+    delete project.likes;
+
+    project.currentUsersLikeId = likedByCurrentUser ? likedByCurrentUser.likeId : null;
+
+
+
+
+
+
+
+
+
+
+    // const { name, creatorId, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified, firstName, lastName, photoUrl, likeId, likerUserId } = project;
+
+    // project = { id: +id, name, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified, likesCount: +likesCount };
+
+    // project.creator = creator;
+
     
+
     // Verify project exists before continuing (& throw error if not)
     if (!project) throw new NotFoundError(`No project ${id} was found.`);
 

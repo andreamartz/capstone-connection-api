@@ -1,5 +1,6 @@
 "use strict";
 
+// const _ = require('lodash');
 const db = require("../db");
 const bcrypt = require("bcrypt");
 
@@ -80,7 +81,7 @@ class User {
 
   /** Purpose: to register a user
    *
-   * Inputs: { username, password, firstName, lastName, email, bio, photoUrl, portfolioUrl, githubUrl }
+   * Inputs: { username, password, firstName, lastName, email, bio, photoUrl, portfolioUrl, gitHubUrl }
    * 
    * Returns: 
    *   {
@@ -90,10 +91,11 @@ class User {
    *         password,
    *         firstName,
    *         lastName, 
+   *         email,
    *         bio, 
    *         photoUrl, 
    *         portfolioUrl, 
-   *         githubUrl,
+   *         gitHubUrl,
    *         isAdmin
    *       }
    *   }
@@ -101,7 +103,7 @@ class User {
    * Throws BadRequestError on duplicates.
   **/
 
-  // static async register({ username, password, firstName, lastName, bio, photoUrl, portfolioUrl, githubUrl, isAdmin }) {
+  static async register({ username, password, firstName, lastName, bio, photoUrl, portfolioUrl, githubUrl, isAdmin }) {
   //   // check if the username has been taken already
   //   const duplicateCheck = await db.query(
   //     `SELECT username
@@ -195,7 +197,7 @@ class User {
     `;
 
     const usernameRes = await db.query(queryUsername, [username]);
-    // console.log("USERNAMERES: ", usernameRes);
+    console.log("USERNAMERES: ", usernameRes);
     const userId = usernameRes.rows[0].id;
     console.log("USERNAMERES.ROWS[0].id: ", userId);
     if (!userId) throw new NotFoundError(`No user with ${username} was found.`);
@@ -228,7 +230,8 @@ class User {
     `;
 
     const userResults = await db.query(query, [userId]);
-    console.log("USERRESULTS.ROWS: ", userResults.rows);
+    // console.log("USERRESULTS.ROWS: ", userResults.rows);
+    console.log("Number of rows in USERRESULTS.ROWS: ", userResults.rows.length);
 
     const projects = [];
 
@@ -240,11 +243,15 @@ class User {
       projects.push(project);
     }
 
+    // console.log("PROJECTS: ", projects);
+
     const { id, firstName, lastName, bio, photoUrl, portfolioUrl, gitHubUrl } = userResults.rows[0];
 
     const user = { id, username, firstName, lastName, bio, photoUrl, portfolioUrl, gitHubUrl };
 
-    user.projects = projects
+    user.projects = projects;
+
+    console.log("USER: ", user);
 
     // Verify user exists before continuing (& throw error if not)
 
@@ -252,6 +259,8 @@ class User {
 
     return user;
   }
+
+
 
   /** Update user data with `data` */
   static async update(username, data) {

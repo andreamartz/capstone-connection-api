@@ -14,7 +14,7 @@ const Project_Like = require("../models/project_like");
 
 const router = new express.Router();
 
-/** POST /project_likes/new 
+/** POST /project_likes
  * 
  * Purpose: create a new like for a project and save to database
  * 
@@ -27,11 +27,33 @@ const router = new express.Router();
  * Errors:
 */
 
-router.post("/new", async function (req, res, next) {
+router.post("/", async function (req, res, next) {
   try {
     console.log("BACKEND REQ.BODY: ", req.body);
     const projectLike = await Project_Like.create(req.body);
     return res.status(201).json({ projectLike });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+/** DELETE /project_likes/[id] 
+ * 
+ * Purpose: delete from database a like for a project
+ * 
+ * Req.body: 
+ * 
+ * Returns:
+ * 
+ * Auth required:
+ * 
+ * Errors:
+*/
+
+router.delete("/:id", async function (req, res, next) {
+  try {
+    const projectLike = await Project_Like.remove(req.params.id);
+    return res.json({ deleted: req.params.id });
   } catch (err) {
     return next(err);
   }

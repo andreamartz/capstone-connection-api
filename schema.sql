@@ -16,7 +16,7 @@ CREATE TABLE projects (
   id SERIAL PRIMARY KEY,
   name VARCHAR(100) NOT NULL UNIQUE,
   creator_id INTEGER REFERENCES users ON DELETE CASCADE,
-  image TEXT DEFAULT './static/default-project-image-pixabay-dev-illustration.png',
+  image TEXT DEFAULT 'https://res.cloudinary.com/wahmof2/image/upload/v1626296156/capstone_connections/undraw_Website_builder_re_ii6e.svg',
   repo_url TEXT NOT NULL UNIQUE,
   site_url TEXT NOT NULL,
   description VARCHAR(500),

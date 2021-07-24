@@ -2,35 +2,36 @@
 
 /** Shared config for application; can be req'd many places. */
 
-// require("dotenv").config();
+require("dotenv").config();
 
-// const SECRET_KEY = process.env.SECRET_KEY || "gra*$jkyuludsth";
+// CHECK: is dotenv set up properly here? Do I need to require dotenv in other files?
 
-const PORT = +process.env.PORT || 3001;
+const PORT = +process.env.PORT;
+let DB_URI = process.env.DB_URI;
+let BCRYPT_WORK_FACTOR;
 
-// let BCRYPT_WORK_FACTOR;
 
 // database is:
 //
 // - on Heroku, get from env var DATABASE_URL
-// - in testing, 'capstone-cnxn-test'
-// - else: 'capstone-cnxn'
+// - in testing, 'capstone_connections_test'
+// - else: 'capstone_connections'
 
-// let DB_URI = `postgresql://`;
 
-// if (process.env.NODE_ENV === "test") {   // if in testing environment
-//   DB_URI = `${DB_URI}/capstone-cnxn-test`;  // use test database called "capstone-cnxn-test"
-//   BCRYPT_WORK_FACTOR = 1;
-// } else {
-//   // otherwise, use the database specified in env variable used in deployment 
-//   // (e.g., for Heroku, get from env var DATABASE_URL)
-//   DB_URI = process.env.DATABASE_URL || `${DB_URI}/capstone-cnxn`;
-//   BCRYPT_WORK_FACTOR = 12;
-// }
+// if in testing environment, use the test database
+if (process.env.NODE_ENV === "test") {   
+  DB_URI = `${DB_URI}/capstone_connections_test`; 
+  BCRYPT_WORK_FACTOR = 1;
+} else {
+  // otherwise, use the database specified in env variable used in deployment (e.g., for Heroku, get from env var DATABASE_URL)
+  // if project not deployed, use the local database
+  DB_URI = process.env.DATABASE_URL || `${DB_URI}/capstone_connections`;
+
+  BCRYPT_WORK_FACTOR = +process.env.BCRYPT_WORK_FACTOR;
+}
 
 module.exports = {
-  // SECRET_KEY,
-  PORT
-  // DB_URI,
-  // BCRYPT_WORK_FACTOR
+  PORT,
+  DB_URI,
+  BCRYPT_WORK_FACTOR
 };

@@ -14,7 +14,7 @@ const Project_Comment = require("../models/project_comment");
 
 const router = new express.Router();
 
-/** POST /comments/new
+/** POST /comments
  * 
  * Purpose: create a new comment and save to database
  * 
@@ -26,7 +26,7 @@ const router = new express.Router();
  * 
  * Errors: 
  */
-router.post("/new", async function (req, res, next) {
+router.post("/", async function (req, res, next) {
   console.debug("CREATE NEW COMMENT");
   try {
     const comment = await Project_Comment.create(req.body);

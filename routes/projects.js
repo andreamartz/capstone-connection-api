@@ -17,9 +17,12 @@ const Project_Tag = require("../models/project_tag");
 
 const router = new express.Router();
 
-/** POST /projects/new
- * 
+/** POST /projects
  * Purpose: create a new project and save to database
+ * - requests to store image in on cloudinary.com
+ * - requests to create a new project with the image in dtbs
+ * - requests to add tags to the project in dtbs
+ * 
  * 
  * Req body:  { project }
  * 
@@ -29,7 +32,7 @@ const router = new express.Router();
  * 
  * Errors: 
  */
-router.post("/new", async function (req, res, next) {
+router.post("/", async function (req, res, next) {
   console.debug("CREATE NEW PRJ");
   try {
     const fileStr = req.body.image;  
