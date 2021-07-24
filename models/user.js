@@ -103,67 +103,77 @@ class User {
    * Throws BadRequestError on duplicates.
   **/
 
-  static async register({ username, password, firstName, lastName, bio, photoUrl, portfolioUrl, githubUrl, isAdmin }) {
-  //   // check if the username has been taken already
-  //   const duplicateCheck = await db.query(
-  //     `SELECT username
-  //      FROM users
-  //      WHERE username = $1`,
-  //      [username]
-  //   );
+  static async register({
+    username, 
+    password, 
+    firstName, 
+    lastName, 
+    email, 
+    bio, 
+    photoUrl, 
+    portfolioUrl, 
+    gitHubUrl, 
+    isAdmin }) {
+    // check if the username has been taken already
+    const duplicateCheck = await db.query(
+      `SELECT username
+       FROM users
+       WHERE username = $1`,
+       [username]
+    );
 
-  //   // throw error if duplicate found
-  //   if (duplicateCheck.rows[0]) {
-  //     throw new BadRequestError(`The username '${username}' has been taken; please choose another.`);
-  //   }
+    // throw error if duplicate found
+    if (duplicateCheck.rows[0]) {
+      throw new BadRequestError(`The username '${username}' has been taken; please choose another.`);
+    }
 
-  //   // no duplicate found; save user to database
-  //   const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
+    // no duplicate found; save user to database
+    const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
+    
+    const query = `
+      INSERT INTO users
+        (username,
+        password,
+        first_name,
+        last_name,
+        email,
+        bio,
+        photo_url,
+        portfolio_url,
+        github_url,
+        is_admin)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      RETURNING 
+        id,
+        username, 
+        first_name AS "firstName",
+        last_name AS "lastName",
+        email, 
+        bio, 
+        photo_url AS "photoUrl",
+        portfolio_url AS "portfolioUrl",
+        github_url AS "githubUrl",
+        is_admin AS "isAdmin"
+    `;
+    const result = await db.query(query,
+      [
+        username,
+        hashedPassword,
+        firstName,
+        lastName,
+        email,
+        bio,
+        photoUrl,
+        portfolioUrl,
+        githubUrl,
+        isAdmin
+      ],
+    );
 
-  //   const result = await db.query(
-  //     `INSERT INTO users
-  //      (username,
-  //       password,
-  //       first_name,
-  //       last_name,
-  //       email,
-  //       bio,
-  //       photo_url,
-  //       portfolio_url,
-  //       github_url,
-  //       is_admin)
-  //     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-  //     RETURNING 
-  //       id,
-  //       username, 
-  //       first_name AS "firstName",
-  //       last_name AS "lastName",
-  //       email, 
-  //       bio, 
-  //       photo_url AS "photoUrl",
-  //       portfolio_url AS "portfolioUrl",
-  //       github_url AS "githubUrl",
-  //       is_admin AS "isAdmin"`,
-  //     [
-  //       username,
-  //       hashedPassword,
-  //       firstName,
-  //       lastName,
-  //       email,
-  //       bio,
-  //       photoUrl,
-  //       portfolioUrl,
-  //       githubUrl,
-  //       isAdmin
-  //     ],
-  //   );
+    const user = result.rows[0];
 
-  //   const user = result.rows[0];
-
-  //   return user;
+    return user;
   }
-
-
 
   /** Purpose: Get a specific user by username 
    * 
