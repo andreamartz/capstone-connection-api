@@ -102,7 +102,8 @@ router.get('/', async function (req, res, next) {
 
 router.get('/:id', async function (req, res, next) {
   try {
-    const project = await Project.getOne(req.params.id);
+    const currentUserId = res.locals.user.id;
+    const project = await Project.getOne(currentUserId, req.params.id);
     return res.json({ project });
   } catch (err) {
     return next(err);

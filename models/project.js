@@ -341,7 +341,7 @@ class Project {
   *  Error(s): 
   */
 
-  static async getOne(id) {
+  static async getOne(currentUserId, id) {
     const prjQuery = `
       SELECT 
         p.id AS id,
@@ -414,7 +414,7 @@ class Project {
     project.likesCount = project.likes.length;
 
     // CHECK: remove hard-coded user once we have auth
-    const currentUserId = 3;    
+    // const currentUserId = 3;    
 
     const likedByCurrentUser = project.likes.find(like => like.likerUserId === currentUserId);
 
