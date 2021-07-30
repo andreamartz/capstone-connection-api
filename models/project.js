@@ -119,7 +119,7 @@ class Project {
    * Error(s): 
    */
 
-  static async getAll(filterParams = {}) {
+  static async getAll(currentUserId, filterParams = {}) {
     let query = `
       SELECT 
         p.id,
@@ -273,7 +273,10 @@ class Project {
       delete project.likes;
       
       // CHECK: remove hard-coded user once we have auth
-      const currentUserId = 3;
+      // console.log("REQ.AUTHORIZATION: ", req.authorization);
+      // get token from req.authorization
+      // decode token to get payload with user information 
+      // const currentUserId = 3;
 
       const likedByCurrentUser = uniqLikes.find(like => like.likerUserId === currentUserId);
       
@@ -281,7 +284,7 @@ class Project {
       project.currentUsersLikeId = likedByCurrentUser ? likedByCurrentUser.likeId : null;
     }
 
-    console.log("PROJECTS with new like data: ", projects);
+    // console.log("PROJECTS with new like data: ", projects);
 
     return projects;
   }

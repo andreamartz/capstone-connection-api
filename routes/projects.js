@@ -77,7 +77,10 @@ router.post("/", async function (req, res, next) {
 
 router.get('/', async function (req, res, next) {
   try {
-    const projects = await Project.getAll(req.query);
+    const currentUserId = res.locals.user.id;
+
+    const projects = await Project.getAll(currentUserId, req.query);
+
     return res.json({ projects });
   } catch (err) {
     return next(err);
