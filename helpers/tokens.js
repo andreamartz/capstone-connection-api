@@ -9,7 +9,15 @@ function createToken(user) {
     "createToken passed user without isAdmin property");
 
   let payload = {
+    id: user.id,
     username: user.username,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    photoUrl: user.photoUrl,
+    email: user.email,
+    bio: user.bio,
+    portfolioUrl: user.portfolioUrl,
+    gitHubUrl: user.gitHubUrl,
     isAdmin: user.isAdmin || false,
   };
 
