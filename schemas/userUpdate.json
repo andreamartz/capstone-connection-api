@@ -1,0 +1,101 @@
+{
+  "$id": "http://example.com/example.json",
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "default": {},
+  "description": "The root schema comprises the entire JSON document.",
+  "examples": [
+      {
+          "password": "gfKjSl6543w7*&^%",
+          "firstName": "Alice",
+          "lastName": "Jones",
+          "email": "andrea@email.com",
+          "bio": "I am a self-taught web developer with a passion for life-long learning",
+          "portfolioUrl": "https://andreamartz.dev/",
+          "gitHubUrl": "https://github.com/andreamartz"
+      }
+  ],
+  "required": [],
+  "title": "The root schema",
+  "type": "object",
+  "properties": {
+      "password": {
+          "$id": "#/properties/password",
+          "type": "string",
+          "title": "The password schema",
+          "description": "An explanation about the purpose of this instance.",
+          "default": "",
+          "examples": [
+              "gfKjSl6543w7*&^%"
+          ],
+          "minLength": 8
+      },
+      "firstName": {
+          "$id": "#/properties/firstName",
+          "type": "string",
+          "title": "The firstName schema",
+          "description": "An explanation about the purpose of this instance.",
+          "default": "",
+          "examples": [
+              "Alice"
+          ],
+          "minLength": 3
+      },
+      "lastName": {
+          "$id": "#/properties/lastName",
+          "type": "string",
+          "title": "The lastName schema",
+          "description": "An explanation about the purpose of this instance.",
+          "default": "",
+          "examples": [
+              "Jones"
+          ],
+          "minLength": 2
+      },
+      "email": {
+          "$id": "#/properties/email",
+          "type": "string",
+          "title": "The email schema",
+          "description": "An explanation about the purpose of this instance.",
+          "default": "",
+          "examples": [
+              "andrea@email.com"
+          ],
+          "format": "email"
+      },
+      "bio": {
+          "$id": "#/properties/bio",
+          "type": "string",
+          "title": "The bio schema",
+          "description": "An explanation about the purpose of this instance.",
+          "default": "",
+          "examples": [
+              "I am a self-taught web developer with a passion for life-long learning"
+          ]
+      },
+      "portfolioUrl": {
+          "$id": "#/properties/portfolioUrl",
+          "type": "string",
+          "title": "The portfolioUrl schema",
+          "description": "An explanation about the purpose of this instance.",
+          "default": "",
+          "examples": [
+              "https://andreamartz.dev/"
+          ],
+          "format": "uri",
+          "pattern": "^https?://"
+      },
+      "gitHubUrl": {
+          "$id": "#/properties/gitHubUrl",
+          "type": "string",
+          "title": "The gitHubUrl schema",
+          "description": "An explanation about the purpose of this instance.",
+          "default": "",
+          "examples": [
+              "https://github.com/andreamartz"
+          ],
+          "format": "uri",
+          "pattern": "^https?://"
+      }
+  },
+  "additionalProperties": false
+}
