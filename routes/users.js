@@ -4,6 +4,8 @@
 
 const jsonschema = require("jsonschema");
 
+const userUpdateSchema = require("../schemas/userUpdate.json");
+
 const express = require("express");
 const { ensureCorrectUserOrAdmin, ensureAdmin } = require("../middleware/auth");
 const { BadRequestError } = require("../expressError");
@@ -38,10 +40,16 @@ router.get("/:username", async function (req, res, next) {
   }
 });
 
-/** PATCH /[username] */
-router.patch("/:username", async function (req, res, next) {
+/** PATCH /[id] */
+router.patch("/:id", async function (req, res, next) {
   try {
-    const user = await User.update(req.params.username, req.body);
+    const validator = jsonschema.validate(req.body, userUpdateSchema);
+    if (!validator.valid) {
+      const errors = validator.errors.map(error => error.stack);
+      throw new BadRequestError(errors);
+    }
+
+    const user = await User.update(req.params.id, req.body);
     return res.json({ user });
   } catch (err) {
     return next(err);
