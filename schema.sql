@@ -18,7 +18,7 @@ CREATE TABLE projects (
   creator_id INTEGER REFERENCES users ON DELETE CASCADE,
   image TEXT DEFAULT 'https://res.cloudinary.com/wahmof2/image/upload/v1626296156/capstone_connections/undraw_Website_builder_re_ii6e.svg',
   repo_url TEXT NOT NULL UNIQUE,
-  site_url TEXT NOT NULL,
+  site_url TEXT NOT NULL UNIQUE,
   description VARCHAR(500),
   feedback_request VARCHAR(5000),
   created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
