@@ -46,13 +46,6 @@ CREATE TABLE project_comments (
   last_modified TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE project_comment_likes (
-  id SERIAL PRIMARY KEY,
-  liker_id INTEGER REFERENCES users ON DELETE CASCADE,
-  comment_id INTEGER REFERENCES project_comments ON DELETE CASCADE,
-  UNIQUE (liker_id, comment_id)
-);
-
 -- projects_tags is a many-to-many join table
 CREATE TABLE projects_tags (
   id SERIAL PRIMARY KEY,
