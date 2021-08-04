@@ -13,7 +13,7 @@ const Project_Tag = require("../models/project_tag");
 
 
 // Data validation schemas
-
+const projectNewSchema = require("../schemas/projectNew.json");
 
 const router = new express.Router();
 
@@ -35,16 +35,26 @@ const router = new express.Router();
 router.post("/", async function (req, res, next) {
   console.debug("CREATE NEW PRJ");
   try {
-    const fileStr = req.body.image;  
+    const fileStr = req.body.image;
+    let image;
     // upload image to Cloudinary
-    // console.log("IMAGE BEFORE UPLOAD", fileStr.substr(0, 40));
-    const imageData = await imageUpload(fileStr);
+    if (fileStr) {
+      const imageData = await imageUpload(fileStr);
+      image = imageData.secure_url;
+    } else {
+      image = null
+    }
 
-    const image = imageData.secure_url;
     // console.log("IMAGE AFTER UPLOAD");
     req.body.image = image;
     console.log("REQ.BODY: ", req.body);
     
+    const validator = jsonschema.validate(req.body, projectNewSchema);
+    if (!validator.valid) {
+      const errors = validator.errors.map(error => error.stack);
+      throw new BadRequestError(errors);
+    }
+
     const project = await Project.create(req.body);
     console.log("PROJECT BEFORE ADDING TAGS: ", project);
 
@@ -52,8 +62,8 @@ router.post("/", async function (req, res, next) {
     project.tags=prjTags;
 
     return res.status(201).json({ project });
-  } catch (err) {
-    return next(err);
+  } catch (error) {
+    return next(error);
   }
 });
 
