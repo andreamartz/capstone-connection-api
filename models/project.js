@@ -220,13 +220,6 @@ class Project {
           newRecord.likes = [...accumulator.likes, {likeId, likerUserId}];
         }
 
-        // if (likeId) newRecord.likeId = likeId;
-        // if (likerId) newRecord.likerId = likerId;
-
-        // if (likeId) {
-        //   newRecord.likes = [...accumulator.likes, { likeId, likerId}]
-        // }
-        
         return newRecord;
       }, { id: +prop, 
            name: "",
@@ -246,12 +239,7 @@ class Project {
       projects.push(prjRow);
     };
 
-    // let prjRows = _.groupBy(results.rows, row => row.id);
     for (const project of projects) {
-      if (project.id === 1) {
-        console.log("PROJECT: ", project);
-      }
-
       const uniqTags = _.uniqBy(project.tags, function(tag){
         return tag.id;
       });
@@ -264,27 +252,14 @@ class Project {
 
       // project.likes = uniqLikes;
 
-      if (project.id === 1) {
-        console.log("PROJECT 1 UNIQLIKES: ", uniqLikes);
-      }
-
       project.likesCount = uniqLikes.length;
 
       delete project.likes;
       
-      // CHECK: remove hard-coded user once we have auth
-      // console.log("REQ.AUTHORIZATION: ", req.authorization);
-      // get token from req.authorization
-      // decode token to get payload with user information 
-      // const currentUserId = 3;
-
       const likedByCurrentUser = uniqLikes.find(like => like.likerUserId === currentUserId);
       
-
       project.currentUsersLikeId = likedByCurrentUser ? likedByCurrentUser.likeId : null;
     }
-
-    // console.log("PROJECTS with new like data: ", projects);
 
     return projects;
   }
@@ -413,31 +388,11 @@ class Project {
     
     project.likesCount = project.likes.length;
 
-    // CHECK: remove hard-coded user once we have auth
-    // const currentUserId = 3;    
-
     const likedByCurrentUser = project.likes.find(like => like.likerUserId === currentUserId);
 
     delete project.likes;
 
     project.currentUsersLikeId = likedByCurrentUser ? likedByCurrentUser.likeId : null;
-
-
-
-
-
-
-
-
-
-
-    // const { name, creatorId, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified, firstName, lastName, photoUrl, likeId, likerUserId } = project;
-
-    // project = { id: +id, name, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified, likesCount: +likesCount };
-
-    // project.creator = creator;
-
-    
 
     // Verify project exists before continuing (& throw error if not)
     if (!project) throw new NotFoundError(`No project ${id} was found.`);
