@@ -273,8 +273,44 @@ class User {
 
 
   /** Update user data with `data` */
-  static async update(username, data) {
+  static async update(userId, data) {
+    if (data.password) {
+      data.password = await bcrypt.hash(data.password, BCRYPT_WORK_FACTOR);
+    }
 
+    const { setCols, values } = sqlForPartialUpdate(
+      data,
+      {
+        firstName: "first_name",
+        lastName: "last_name",
+        portfolioUrl: "portfolio_url",
+        gitHubUrl: "github_url"
+      }
+    );
+
+    const userIdVarIdx = "$" + (values.length + 1);
+
+    const querySql = `
+      UPDATE users
+      SET ${setCols}
+      WHERE id = ${userIdVarIdx}
+      RETURNING id,
+        username,
+        first_name AS "firstName",
+        last_name AS "lastName",
+        email,
+        bio,
+        portfolio_url AS "portfolioUrl",
+        github_url AS "gitHubUrl"
+    `;
+
+    const result = await db.query(querySql, [...values, userId]);
+    const user =  result.rows[0];
+
+    if (!user) throw new NotFoundError(`No user found with id ${userId}`);
+
+    // delete user.password;
+    return user;
   }
 
 
