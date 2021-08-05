@@ -329,6 +329,7 @@ class Project {
         p.feedback_request AS "feedbackRequest",
         p.created_at AS "createdAt",
         p.last_modified AS "lastModified",
+        u.username,
         u.first_name AS "firstName",
         u.last_name AS "lastName",
         u.photo_url AS "photoUrl",
@@ -352,13 +353,14 @@ class Project {
     
 
     const project = projectRows.reduce((accumulator, data) => {
-      const { id, name, creatorId, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified, firstName, lastName, photoUrl, likeId, likerUserId } = data;
+      const { id, name, creatorId, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified, username, firstName, lastName, photoUrl, likeId, likerUserId } = data;
 
       const newRecord = {id, name, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified 
       };
 
       newRecord.creator = { ...accumulator.creator, 
         id: creatorId,
+        username,
         firstName,
         lastName,
         photoUrl
