@@ -29,8 +29,14 @@ const router = new express.Router();
 
 router.post("/", async function (req, res, next) {
   try {
-    console.log("BACKEND REQ.BODY: ", req.body);
+    // console.log("BACKEND REQ.BODY: ", req.body);
+    // console.log("BACKEND REQ.USER: ", req.user);
+    // console.log("BACKEND REQ.LOCALS: ", req.locals);
+    // console.log("BACKEND REQ.AUTH: ", req.auth);
+    console.log("BACKEND REQ.AUTHORIZATION: ", req.authorization);
+
     const projectLike = await Project_Like.create(req.body);
+
     return res.status(201).json({ projectLike });
   } catch (err) {
     return next(err);
