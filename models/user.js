@@ -3,7 +3,8 @@
 // const _ = require('lodash');
 const db = require("../db");
 const bcrypt = require("bcrypt");
-
+const { BCRYPT_WORK_FACTOR } = require("../config.js");
+const { sqlForPartialUpdate }  = require("../helpers/sql");
 const {
   BadRequestError,
   UnauthorizedError,
@@ -11,7 +12,7 @@ const {
   NotFoundError,
 } = require("../expressError");
 
-const { BCRYPT_WORK_FACTOR } = require("../config.js");
+
 
 /** Functions for users */
 
@@ -74,11 +75,6 @@ class User {
     throw new UnauthorizedError("Invalid username and/or password. Please try again.");
   }
 
-
-
-
-
-
   /** Purpose: to register a user
    *
    * Inputs: { username, password, firstName, lastName, email, bio, photoUrl, portfolioUrl, gitHubUrl }
@@ -86,9 +82,9 @@ class User {
    * Returns: 
    *   {
    *     user: 
-   *       {
+   *       { 
+   *         id,
    *         username,
-   *         password,
    *         firstName,
    *         lastName, 
    *         email,
@@ -126,6 +122,7 @@ class User {
     if (duplicateCheck.rows[0]) {
       throw new BadRequestError(`The username '${username}' has been taken; please choose another.`);
     }
+    // const defaultImageUrl = "https://res.cloudinary.com/wahmof2/image/upload/v1628100605/capstone_connections/users_capstone_connections/default-user-icon.png";
 
     // no duplicate found; save user to database
     const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
@@ -152,7 +149,7 @@ class User {
         bio, 
         photo_url AS "photoUrl",
         portfolio_url AS "portfolioUrl",
-        github_url AS "githubUrl",
+        github_url AS "gitHubUrl",
         is_admin AS "isAdmin"
     `;
     const result = await db.query(query,
@@ -165,7 +162,7 @@ class User {
         bio,
         photoUrl,
         portfolioUrl,
-        githubUrl,
+        gitHubUrl,
         isAdmin
       ],
     );
