@@ -4,6 +4,7 @@
 
 const jsonschema = require("jsonschema");
 
+// const userNewSchema = require("../schemas/userNew.json");
 const userUpdateSchema = require("../schemas/userUpdate.json");
 
 const express = require("express");
