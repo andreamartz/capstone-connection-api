@@ -10,7 +10,8 @@ const { ensureAdmin } = require("../middleware/auth");
 const Project_Comment = require("../models/project_comment");
 
 // Data validation schemas
-
+const projectCommentsNewSchema = require("../schemas/projectCommentsNew.json");
+const projectCommentsUpdateSchema = require("../schemas/projectCommentsUpdate.json");
 
 const router = new express.Router();
 
@@ -29,6 +30,12 @@ const router = new express.Router();
 router.post("/", async function (req, res, next) {
   console.debug("CREATE NEW COMMENT");
   try {
+    const validator = jsonschema.validate(req.body, projectCommentsNewSchema);
+    if (!validator.valid) {
+      const errors = validator.errors.map(error => error.stack);
+      throw new BadRequestError(errors);
+    }
+
     const comment = await Project_Comment.create(req.body);
     return res.status(201).json({ comment });
   } catch (err) {
@@ -37,11 +44,11 @@ router.post("/", async function (req, res, next) {
 });
 
 
-/** GET / 
+/** PATCH / []
  * 
- * Purpose: retrieve all comments from the database
+ * Purpose: update a comment in the database
  * 
- * Req body: none
+ * Req body: 
  * 
  * Returns: 
  * 
@@ -49,6 +56,19 @@ router.post("/", async function (req, res, next) {
  * 
  * Errors: 
  */
+router.patch("/:id", async function(req, res, next) {
+  try {
+    const validator = jsonschema.validate(req.body, projectCommentsUpdateSchema);
+    if (!validator.valid) {
+      const errors = validator.errors.map(error => error.stack);
+      throw new BadRequestError(errors);
+    }
 
+    const comment = await Project_Comment.update(req.params.id, req.body);
+    return res.json({ comment });
+  } catch (error) {
+    return next(error);
+  }
+});
 
  module.exports = router;
