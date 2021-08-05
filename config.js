@@ -6,6 +6,7 @@ require("dotenv").config();
 
 // CHECK: is dotenv set up properly here? Do I need to require dotenv in other files?
 
+const SECRET_KEY = process.env.SECRET_KEY;
 const PORT = +process.env.PORT;
 let DB_URI = process.env.DB_URI;
 let BCRYPT_WORK_FACTOR;
@@ -31,6 +32,7 @@ if (process.env.NODE_ENV === "test") {
 }
 
 module.exports = {
+  SECRET_KEY,
   PORT,
   DB_URI,
   BCRYPT_WORK_FACTOR
