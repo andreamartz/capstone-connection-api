@@ -1,7 +1,9 @@
 "use strict";
 
-const { result } = require("lodash");
+// const { result } = require("lodash");
 const db = require("../db");
+const { NotFoundError } = require("../expressError");
+const { sqlForPartialUpdate }  = require("../helpers/sql");
 
 class Project_Comment {
 
@@ -23,8 +25,8 @@ class Project_Comment {
     `
     
     const result = await db.query(query, [
-      data.commenter_id,
-      data.project_id,
+      data.commenterId,
+      data.projectId,
       data.comment
     ]);
 
