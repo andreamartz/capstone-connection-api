@@ -67,11 +67,18 @@ router.post("/token", async function(req, res, next) {
    console.debug("REGISTER A USER");
   try {
     const fileStr = req.body.photoUrl;
+    let photoUrl;
     // upload image to Cloudinary
+    if (fileStr) {
+      const imageData = await imageUpload(fileStr);
+      photoUrl = imageData.secure_url;
+    } else {
+      photoUrl = null;
+    }
     console.log("IMAGE BEFORE UPLOAD", fileStr.substr(0, 40));
-    const imageData = await imageUpload(fileStr);
+    // const imageData = await imageUpload(fileStr);
 
-    const photoUrl = imageData.secure_url;
+    // const photoUrl = imageData.secure_url;
     console.log("IMAGE AFTER UPLOAD");
     req.body.photoUrl = photoUrl;
     console.log("REQ.BODY: ", req.body);
@@ -80,14 +87,12 @@ router.post("/token", async function(req, res, next) {
     const validator = jsonschema.validate(req.body, userRegisterSchema);
     console.log("USER REGISTRATION VALIDATOR: ", validator);
     if (!validator.valid) {
-      const errs = validator.errors.map(e => e.stack);
-      throw new BadRequestError(errs);
+      const errors = validator.errors.map(e => e.stack);
+      throw new BadRequestError(errors);
     }
     
-    console.log("VALIDATOR IS VALID!");
     const newUser = await User.register({ ...req.body, isAdmin: false });
     const token = createToken(newUser);
-    console.log("TOKEN: ", token);
     return res.status(201).json({ token });
   } catch (err) {
     if (err.code === '23505') {
