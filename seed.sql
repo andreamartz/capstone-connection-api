@@ -170,8 +170,7 @@ VALUES  ('Access Academy',
         null,
         'https://noelvoice.com/',
         'Website for Grainne Noel’s voice acting business.',
-        E'* Design feedback would be appreciated. \n
-        * An accessibility review would be great.'
+        '* Design feedback would be appreciated. * An accessibility review would be great.'
         ),
         ('Carbe Diem',
         7,
@@ -187,7 +186,7 @@ VALUES  ('Access Academy',
         'https://github.com/debrakayeelliott/coffeeheaven',
         'https://coffeeheaven.netlify.app/',
         'A fun one-page website illustrating my love of coffee to help "learn by building" in dev speak.',
-        E'1. How can I account for font choice not being available to everyone/have a choice other than default Arial that everyone can see? \n2. How can I make my site more response without a bunch of complexities?'
+        '1. How can I account for font choice not being available to everyone/have a choice other than default Arial that everyone can see? 2. How can I make my site more response without a bunch of complexities?'
         );
 
 
