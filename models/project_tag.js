@@ -15,7 +15,7 @@ const { sqlForPartialUpdate } = require("../helpers/sql");
 class Project_Tag {
   /** Purpose: to put a tag on a project, update database, and return the data
    * 
-   * Input: { projectId, [ tagId, tagId, ... ]}
+   * Input: { projectId, tags: [ tagId, tagId, ... ]}
    * 
    * Returns:
    *   {

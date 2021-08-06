@@ -11,7 +11,6 @@ const authRoutes = require("./routes/auth");
 const usersRoutes = require("./routes/users");
 const projectsRoutes = require("./routes/projects");
 const tagsRoutes = require("./routes/tags");
-// const projectsTagsRoutes = require("./routes/projects_tags");
 const projectCommentsRoutes = require("./routes/project_comments");
 
 const morgan = require("morgan");
@@ -28,7 +27,6 @@ app.use("/auth", authRoutes);
 app.use("/users", usersRoutes);
 app.use("/projects", projectsRoutes);
 app.use("/tags", tagsRoutes);
-// app.use("/projects_tags", projectsTagsRoutes);
 app.use("/project_comments", projectCommentsRoutes);
 
 

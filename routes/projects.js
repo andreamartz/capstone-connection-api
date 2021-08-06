@@ -96,6 +96,41 @@ router.post("/:id/likes", async function (req, res, next) {
   }
 });
 
+/** POST /:id/tags
+ *  
+ * Purpose: add a tag to a project
+ * 
+ * Req.body: { projectId, tags: [ tagId, tagId, ... ] }
+ * 
+ * Returns:
+ *   {
+ *     project_tags: [
+ *       { projectId, tagId },
+ *       { projectId, tagId }
+ *     ]
+ *   }
+ * 
+ * Auth required: 
+ * 
+ * Errors:
+ */
+
+ router.post("/:id/tags", async function (req, res, next) {
+  try {
+    // console.log("BACKEND REQ.BODY: ", req.body);
+    // console.log("BACKEND REQ.USER: ", req.user);
+    // console.log("BACKEND REQ.LOCALS: ", req.locals);
+    // console.log("BACKEND REQ.AUTH: ", req.auth);
+    console.log("BACKEND REQ.BODY: ", req.body);
+    const projectId = req.params.id;
+
+    const projectTag = await Project_Tag.create(projectId, tags);
+
+    return res.status(201).json({ projectTag });
+  } catch (err) {
+    return next(err);
+  }
+});
 
 /** GET / 
  * 
