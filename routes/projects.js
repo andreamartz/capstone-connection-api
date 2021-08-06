@@ -43,12 +43,13 @@ router.post("/", async function (req, res, next) {
       const imageData = await imageUpload(fileStr);
       image = imageData.secure_url;
     } else {
-      image = null;
+      image = "https://res.cloudinary.com/wahmof2/image/upload/v1626296156/capstone_connections/projects_capstone_connections/undraw_Website_builder_re_ii6e.svg";
     }
+
 
     // console.log("IMAGE AFTER UPLOAD");
     req.body.image = image;
-    console.log("REQ.BODY: ", req.body);
+    // console.log("REQ.BODY: ", req.body);
     
     const validator = jsonschema.validate(req.body, projectNewSchema);
     if (!validator.valid) {
