@@ -42,7 +42,7 @@ router.post("/", async function (req, res, next) {
       const imageData = await imageUpload(fileStr);
       image = imageData.secure_url;
     } else {
-      image = null
+      image = null;
     }
 
     // console.log("IMAGE AFTER UPLOAD");
