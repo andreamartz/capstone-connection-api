@@ -80,7 +80,7 @@ class Project {
 
   /** Purpose: get all projects 
    * 
-   * Input: none
+   * Input: currentUserId, filterParams
    * 
    * Returns:
    *   {
@@ -162,11 +162,11 @@ class Project {
     const whereExpressions = [];
     const queryValues = [];
 
-    const { username, tagText } = filterParams;
+    const { userId, tagText } = filterParams;
 
-    if (username) {
-      queryValues.push(username);
-      whereExpressions.push(`u.username = $${queryValues.length}`);
+    if (userId) {
+      queryValues.push(userId);
+      whereExpressions.push(`u.id = $${queryValues.length}`);
       console.log("QUERY VALUES: ", queryValues);
       console.log("WHERE EXPRESSIONS: ", whereExpressions);
     };

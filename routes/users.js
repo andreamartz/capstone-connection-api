@@ -31,10 +31,10 @@ router.get("/", async function (req, res, next) {
   }
 });
 
-/** GET /[username] */
-router.get("/:username", async function (req, res, next) {
+/** GET /[id] */
+router.get("/:id", async function (req, res, next) {
   try {
-    const user = await User.getOne(req.params.username);
+    const user = await User.getOne(req.params.id);
     return res.json({ user });
   } catch (err) {
     return next(err);

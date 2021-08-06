@@ -194,20 +194,20 @@ class User {
    * Errors: Throws UnauthorizedError if user is not found or password is wrong
   */
 
-  static async getOne(username) {
-    const queryUsername = `
+  static async getOne(userId) {
+    const queryUserId = `
       SELECT
         id,
         username
       FROM users
-      WHERE username = $1
+      WHERE id = $1
     `;
 
-    const usernameRes = await db.query(queryUsername, [username]);
-    console.log("USERNAMERES: ", usernameRes);
-    const userId = usernameRes.rows[0].id;
-    console.log("USERNAMERES.ROWS[0].id: ", userId);
-    if (!userId) throw new NotFoundError(`No user with ${username} was found.`);
+    const userIdQueryRes = await db.query(queryUserId, [userId]);
+    console.log("USERIDQUERYRES: ", userIdQueryRes);
+    // const userId = usernameRes.rows[0].id;
+    // console.log("USERNAMERES.ROWS[0].id: ", userId);
+    if (!userId) throw new NotFoundError(`No user with id ${id} was found.`);
 
     
     const query = `
@@ -237,7 +237,6 @@ class User {
     `;
 
     const userResults = await db.query(query, [userId]);
-    // console.log("USERRESULTS.ROWS: ", userResults.rows);
     console.log("Number of rows in USERRESULTS.ROWS: ", userResults.rows.length);
 
     const projects = [];
@@ -252,7 +251,7 @@ class User {
 
     // console.log("PROJECTS: ", projects);
 
-    const { id, firstName, lastName, bio, photoUrl, portfolioUrl, gitHubUrl } = userResults.rows[0];
+    const { id, username, firstName, lastName, bio, photoUrl, portfolioUrl, gitHubUrl } = userResults.rows[0];
 
     const user = { id, username, firstName, lastName, bio, photoUrl, portfolioUrl, gitHubUrl };
 
