@@ -46,6 +46,8 @@ class Project {
    */
 
    static async create(data) {
+    const defaultImageUrl = "https://res.cloudinary.com/wahmof2/image/upload/v1626296156/capstone_connections/undraw_Website_builder_re_ii6e.svg";
+
     const result = await db.query(
       `INSERT INTO projects (
         name,
@@ -62,7 +64,7 @@ class Project {
         data.name,
         data.description,
         data.creatorId,
-        data.image,
+        data.image || defaultImageUrl,
         data.repoUrl,
         data.siteUrl,
         data.feedbackRequest
