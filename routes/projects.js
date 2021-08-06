@@ -10,10 +10,11 @@ const { ensureAdmin } = require("../middleware/auth");
 const imageUpload = require("../helpers/imageUpload");
 const Project = require("../models/project");
 const Project_Tag = require("../models/project_tag");
-
+const Project_Like = require("../models/project_like");
 
 // Data validation schemas
 const projectNewSchema = require("../schemas/projectNew.json");
+
 
 const router = new express.Router();
 
@@ -64,6 +65,34 @@ router.post("/", async function (req, res, next) {
     return res.status(201).json({ project });
   } catch (error) {
     return next(error);
+  }
+});
+
+/** POST /:id/likes
+ *  
+ * Purpose: add a like to a project
+ * 
+ * Req.body: { projectId, likerId }
+ * 
+ * Returns:
+ * 
+ * Auth required: 
+ * 
+ * Errors:
+ */
+router.post("/:id/likes", async function (req, res, next) {
+  try {
+    // console.log("BACKEND REQ.BODY: ", req.body);
+    // console.log("BACKEND REQ.USER: ", req.user);
+    // console.log("BACKEND REQ.LOCALS: ", req.locals);
+    // console.log("BACKEND REQ.AUTH: ", req.auth);
+    console.log("BACKEND REQ.AUTHORIZATION: ", req.authorization);
+
+    const projectLike = await Project_Like.create(req.body);
+
+    return res.status(201).json({ projectLike });
+  } catch (err) {
+    return next(err);
   }
 });
 
@@ -157,6 +186,32 @@ router.delete("/:id", async function(req, res, next) {
   try {
     await Project.remove(req.params.handle);
     return res.json({ deleted: req.params.id });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+/** DELETE /:id/likes/:id
+ * 
+ * Purpose: delete a like from a project
+ * 
+ * Req body: { projectId, currentUsersLikeId }
+ * 
+ * Returns: 
+ * 
+ * Auth required:
+ * 
+ * Errors:
+ */
+
+router.delete("/:projectId/likes/:currentUsersLikeId", async function(req, res, next) {
+  try {
+    // console.log("REQ.PARAMS: ", req.params);
+    console.log("REQ.BODY: ", req.body);
+    // const projectLike = await Project_Like.remove(req.params.id);
+    const { currentUsersLikeId } = req.body;
+    const projectLike = await Project_Like.remove(currentUsersLikeId);
+    return res.json({ deleted: currentUsersLikeId });
   } catch (err) {
     return next(err);
   }

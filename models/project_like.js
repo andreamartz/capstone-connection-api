@@ -47,10 +47,7 @@ class Project_Like {
 
   /** Purpose: to delete a like from a project in database
    * 
-   * Input: {
-   *   likerId,
-   *   projectId
-   * }
+   * Input: { id }
    * 
    * Returns: 
    * 
