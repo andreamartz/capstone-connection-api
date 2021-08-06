@@ -11,6 +11,7 @@ const express = require("express");
 const { ensureCorrectUserOrAdmin, ensureAdmin } = require("../middleware/auth");
 const { BadRequestError } = require("../expressError");
 const User = require("../models/user");
+const Project = require("../models/project");
 const { createToken } = require("../helpers/tokens");
 
 
@@ -36,6 +37,19 @@ router.get("/:id", async function (req, res, next) {
   try {
     const user = await User.getOne(req.params.id);
     return res.json({ user });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+/** GET /[id]/projects */
+router.get("/:id/projects", async function (req, res, next) {
+  try {
+    const userId = req.params.id;
+    const currentUserId = res.locals.user.id;
+
+    const projects = await Project.getAll(currentUserId, { userId });
+    return res.json({ projects });
   } catch (err) {
     return next(err);
   }
