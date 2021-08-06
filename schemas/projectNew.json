@@ -49,15 +49,13 @@
       },
       "repoUrl": {
           "$id": "#/properties/repoUrl",
-          "type": "string",
+          "type": ["string", "null"],
           "title": "The repoUrl schema",
           "description": "An explanation about the purpose of this instance.",
           "default": "",
           "examples": [
               "https://developer.mozilla.org/2"
-          ],
-          "format": "uri",
-          "pattern": "^https?://"
+          ]
       },
       "siteUrl": {
           "$id": "#/properties/siteUrl",
