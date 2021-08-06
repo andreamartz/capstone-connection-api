@@ -255,7 +255,8 @@ class Project {
       // project.likes = uniqLikes;
 
       project.likesCount = uniqLikes.length;
-
+      
+      console.log("PROJECT.LIKES: ", project.likes);
       delete project.likes;
       
       const likedByCurrentUser = uniqLikes.find(like => like.likerUserId === currentUserId);
