@@ -188,7 +188,8 @@ class Project {
     // Create (empty) projects array to push project data into
     let projects = [];
 
-    console.log("PRJROWS: ", prjRows);
+    // console.log("PRJROWS: ", prjRows);
+
     // For loop takes result data grouped by project id and removes duplicate information to create an array of projects
     // QUESTION: This is essentially a nested loop (array reduce method used inside of for loop). Is there a better way?
     for (let prop in prjRows) {
