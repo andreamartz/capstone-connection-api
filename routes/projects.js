@@ -14,6 +14,7 @@ const Project_Like = require("../models/project_like");
 
 // Data validation schemas
 const projectNewSchema = require("../schemas/projectNew.json");
+const projectSearchSchema  = require("../schemas/projectSearch.json")
 
 
 const router = new express.Router();
@@ -151,9 +152,16 @@ router.post("/:id/likes", async function (req, res, next) {
  */
 
 router.get('/', async function (req, res, next) {
+  const currentUserId = res.locals.user.id;
+  console.log("REQ.QUERY for getting projects: ", req.query);
   try {
-    const currentUserId = res.locals.user.id;
+    const validator = jsonschema.validate(req.query, projectSearchSchema);
 
+    if (!validator.valid) {
+      const errors = validator.errors.map(error => error.stack);
+      throw new BadRequestError(errors);
+    }
+    
     const projects = await Project.getAll(currentUserId, req.query);
 
     return res.json({ projects });

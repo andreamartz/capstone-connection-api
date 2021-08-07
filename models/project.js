@@ -165,11 +165,6 @@ class Project {
       console.log("WHERE EXPRESSIONS: ", whereExpressions);
     };
 
-    if (tagText) {
-      queryValues.push(tagText);
-      whereExpressions.push(`t.text = $${queryValues.length}`);
-    };
-
     
     if (whereExpressions.length) {
       query += " WHERE " + whereExpressions.join(' AND ');
@@ -177,10 +172,10 @@ class Project {
 
     // CHECK: QUESTION: why is it not sorting on lastModified?
     query += " ORDER BY p.id DESC";
-    console.log("QUERY: ", query, "QUERY VALUES: ", queryValues);
+    // console.log("QUERY: ", query, "QUERY VALUES: ", queryValues);
 
     const results = await db.query(query, queryValues);
-    // console.log("RESULTS: ", results);
+    // console.log("RESULTS.ROWS in order of most recent first: ", results.rows);
 
     // Group results data by project id
     let prjRows = _.groupBy(results.rows, row => row.id);
@@ -258,6 +253,18 @@ class Project {
       
       project.currentUsersLikeId = likedByCurrentUser ? likedByCurrentUser.likeId : null;
     }
+
+    if (tagText) {
+      projects = projects.filter(
+        project => project.tags.some(
+          tag => tag.text === tagText.toUpperCase()
+        )
+      );
+    };
+
+    projects.sort((a, b) => {
+      return b.createdAt - a.createdAt
+    });
 
     return projects;
   }
