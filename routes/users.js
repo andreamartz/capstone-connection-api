@@ -23,14 +23,14 @@ const router = express.Router();
 /** POST / { user } */
 
 /** GET / */
-router.get("/", async function (req, res, next) {
-  try {
-    const users = await User.findAll();
-    return res.json({ users });
-  } catch (err) {
-    return next(err);
-  }
-});
+// router.get("/", async function (req, res, next) {
+//   try {
+//     const users = await User.findAll();
+//     return res.json({ users });
+//   } catch (err) {
+//     return next(err);
+//   }
+// });
 
 /** GET /[id] */
 router.get("/:id", async function (req, res, next) {
@@ -72,13 +72,13 @@ router.patch("/:id", async function (req, res, next) {
 });
 
 /** DELETE /[id] */
-router.delete("/:id", async function (req, res, next) {
-  try {
-    await User.remove(req.params.id);
-    return res.json({ deleted: req.params.id });
-  } catch (err) {
-    return next(err);
-  }
-});
+// router.delete("/:id", async function (req, res, next) {
+//   try {
+//     await User.remove(req.params.id);
+//     return res.json({ deleted: req.params.id });
+//   } catch (err) {
+//     return next(err);
+//   }
+// });
 
 module.exports = router;
