@@ -153,12 +153,6 @@ class Project {
       ON pl.project_id = p.id
     `;
     
-    // pl.id AS "likeId",
-    // pl.liker_id AS "likerId",
-    // pl.project_id AS "likeProjectId",
-
-    // (SELECT COUNT(*) FROM project_likes AS pl WHERE p.id = pl.project_id) AS "prjLikesCount",
-
     const whereExpressions = [];
     const queryValues = [];
 
