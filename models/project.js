@@ -9,6 +9,7 @@ const {
   NotFoundError,
 } = require("../expressError");
 const { sqlForPartialUpdate } = require("../helpers/sql");
+const { fromDbToExpress } = require("../helpers/projectsSqlToExpress");
 
 /** Functions for projects */
 
@@ -156,7 +157,7 @@ class Project {
     const whereExpressions = [];
     const queryValues = [];
 
-    const { userId, tagText } = filterParams;
+    const { userId, tagText, sortVariable } = filterParams;
 
     if (userId) {
       queryValues.push(userId);
@@ -165,12 +166,10 @@ class Project {
       console.log("WHERE EXPRESSIONS: ", whereExpressions);
     };
 
-    
     if (whereExpressions.length) {
       query += " WHERE " + whereExpressions.join(' AND ');
     }
 
-    // CHECK: QUESTION: why is it not sorting on lastModified?
     query += " ORDER BY p.id DESC";
     // console.log("QUERY: ", query, "QUERY VALUES: ", queryValues);
 
@@ -179,57 +178,7 @@ class Project {
 
     // Group results data by project id
     let prjRows = _.groupBy(results.rows, row => row.id);
-  
-    // Create (empty) projects array to push project data into
-    let projects = [];
-
-    // console.log("PRJROWS: ", prjRows);
-
-    // For loop takes result data grouped by project id and removes duplicate information to create an array of projects
-    // QUESTION: This is essentially a nested loop (array reduce method used inside of for loop). Is there a better way?
-    for (let prop in prjRows) {
-      let prjRow = prjRows[prop].reduce((accumulator, data) => {
-        const { id, name, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified, tagId, tagText, likeId, likerUserId, prjCommentsCount, creatorId, firstName, lastName, photoUrl } = data;
-
-        // The following code works but is not efficient since the values are overwritten on every iteration. (Same question for prj.creator below)
-        // CHECK: QUESTION: Is there a better way?
-        const newRecord = {id, name, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified, prjCommentsCount: +prjCommentsCount};
-        
-        // Store project creator data in an object
-        newRecord.creator = { 
-          id: creatorId,
-          firstName, 
-          lastName, 
-          photoUrl
-        };
-
-        // Store project tags data in an array
-        if (tagId) {
-          newRecord.tags = [...accumulator.tags, {id: tagId, text: tagText}];
-        }
-
-        if (likeId) {
-          newRecord.likes = [...accumulator.likes, {likeId, likerUserId}];
-        }
-
-        return newRecord;
-      }, { id: +prop, 
-           name: "",
-           image: "", 
-           repoUrl: "", 
-           siteUrl: "", 
-           description: "", 
-           feedbackRequest: "", 
-           createdAt: "", 
-           lastModified: "", 
-           prjCommentsCount: null,
-           creator: {}, 
-           tags: [],
-           likes: []
-      });
-      
-      projects.push(prjRow);
-    };
+    const projects = fromDbToExpress(prjRows);
 
     for (const project of projects) {
       const uniqTags = _.uniqBy(project.tags, function(tag){
@@ -246,14 +195,15 @@ class Project {
 
       project.likesCount = uniqLikes.length;
       
-      console.log("PROJECT.LIKES: ", project.likes);
-      delete project.likes;
+      // console.log("PROJECT.LIKES: ", project.likes);
+      // delete project.likes;
       
       const likedByCurrentUser = uniqLikes.find(like => like.likerUserId === currentUserId);
       
       project.currentUsersLikeId = likedByCurrentUser ? likedByCurrentUser.likeId : null;
     }
 
+    /** FILTER */
     if (tagText) {
       projects = projects.filter(
         project => project.tags.some(
@@ -261,10 +211,20 @@ class Project {
         )
       );
     };
-
-    projects.sort((a, b) => {
-      return b.createdAt - a.createdAt
-    });
+    
+    /** SORT */
+    if (sortVariable === 'newest') {
+      projects.sort((a, b) => {
+        return b.createdAt - a.createdAt
+      });
+    } else if (sortVariable === 'most likes') {
+      projects.sort((a, b) => {
+        return b.likesCount - a.likesCount
+      }); 
+      for (let project of projects) {
+        console.log("PRJ ID: ", project.id, "PRJ LIKES: ", project.likesCount);
+      }
+    }
 
     return projects;
   }
@@ -351,7 +311,7 @@ class Project {
     // (SELECT COUNT(*) FROM project_likes AS pl WHERE p.id = pl.project_id) AS "likesCount"
 
     const projectRes = await db.query(prjQuery, [id]);
-    console.log("PROJECTRES.ROWS: ", projectRes.rows);
+    // console.log("PROJECTRES.ROWS: ", projectRes.rows);
     let projectRows = projectRes.rows;
     // Verify project exists before continuing (& throw error if not)
     if (!projectRows) throw new NotFoundError(`No project ${id} was found.`);
@@ -391,7 +351,7 @@ class Project {
       likes: []
     });
 
-    console.log("PROJECT: ", project);
+    // console.log("PROJECT: ", project);
     
     project.likesCount = project.likes.length;
 
@@ -457,7 +417,7 @@ class Project {
 
       project.comments = comments;
 
-      console.log("PROJECT: ", project);
+      // console.log("PROJECT: ", project);
 
     return project;
   }
