@@ -75,17 +75,11 @@ router.post("/token", async function(req, res, next) {
     } else {
       photoUrl = null;
     }
-    console.log("IMAGE BEFORE UPLOAD", fileStr.substr(0, 40));
-    // const imageData = await imageUpload(fileStr);
 
-    // const photoUrl = imageData.secure_url;
-    console.log("IMAGE AFTER UPLOAD");
     req.body.photoUrl = photoUrl;
-    console.log("REQ.BODY: ", req.body);
 
     // Validate the data
     const validator = jsonschema.validate(req.body, userRegisterSchema);
-    console.log("USER REGISTRATION VALIDATOR: ", validator);
     if (!validator.valid) {
       const errors = validator.errors.map(e => e.stack);
       throw new BadRequestError(errors);
