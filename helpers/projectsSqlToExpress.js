@@ -1,5 +1,7 @@
 "use strict";
 
+const _ = require('lodash');
+
 /** fromDbToExpress
  * 
  * Input: prjRows
@@ -15,10 +17,17 @@
  * Purpose: fromDbToExpress reduces each project array down to a single object and pushes it onto a new array, called 'projects', which is returned from the function.
  */
 
-const fromDbToExpress = (prjRows) => {
-  let projects = [];
+const projectsFromDbToExpress = (results, currentUserId) => {
+  const projects = [];
 
-  for (let prop in prjRows) {
+  // Group results data by project id
+  const prjRows = _.groupBy(results.rows, row => row.id);
+
+  /** 
+   * Reduce each project array down to a single project object.
+  */ 
+
+  for (const prop in prjRows) {
     let prjRow = prjRows[prop].reduce((accumulator, data) => {
       const { id, name, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified, tagId, tagText, likeId, likerUserId, prjCommentsCount, creatorId, firstName, lastName, photoUrl } = data;
 
@@ -61,7 +70,34 @@ const fromDbToExpress = (prjRows) => {
     });
     projects.push(prjRow);
   };
+
+  /** 
+   * Eliminate duplicates in tags and likes arrays on each project.
+  */ 
+   for (const project of projects) {
+    // create array of unique tags
+    const uniqTags = _.uniqBy(project.tags, function(tag){
+      return tag.id;
+    });
+    project.tags = uniqTags;
+
+    // create array of unique likes
+    const uniqLikes = _.uniqBy(project.likes, function(like) {
+      return like.likeId;
+    });
+    project.likesCount = uniqLikes.length;
+    
+    // likedByCurrentUser is equal to a like object if the currentUser has liked the project; otherwise it is undefined
+    const likedByCurrentUser = uniqLikes
+      .find(like => like.likerUserId === currentUserId)
+    ;
+    
+    project.currentUsersLikeId = likedByCurrentUser
+    ? likedByCurrentUser.likeId
+    : null;
+  }
+
   return projects;
 }
 
-module.exports = { fromDbToExpress };
+module.exports = { projectsFromDbToExpress };

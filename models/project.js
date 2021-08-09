@@ -9,7 +9,7 @@ const {
   NotFoundError,
 } = require("../expressError");
 const { sqlForPartialUpdate } = require("../helpers/sql");
-const { fromDbToExpress } = require("../helpers/projectsSqlToExpress");
+const { projectsFromDbToExpress } = require("../helpers/projectsSqlToExpress");
 
 /** Functions for projects */
 
@@ -156,54 +156,21 @@ class Project {
     
     const whereExpressions = [];
     const queryValues = [];
-
     const { userId, tagText, sortVariable } = filterParams;
 
+    // if userId passed, get the projects for a specific user
     if (userId) {
       queryValues.push(userId);
       whereExpressions.push(`u.id = $${queryValues.length}`);
-      console.log("QUERY VALUES: ", queryValues);
-      console.log("WHERE EXPRESSIONS: ", whereExpressions);
     };
-
     if (whereExpressions.length) {
       query += " WHERE " + whereExpressions.join(' AND ');
     }
 
-    query += " ORDER BY p.id DESC";
-    // console.log("QUERY: ", query, "QUERY VALUES: ", queryValues);
-
     const results = await db.query(query, queryValues);
-    // console.log("RESULTS.ROWS in order of most recent first: ", results.rows);
+    let projects = projectsFromDbToExpress(results, currentUserId);
 
-    // Group results data by project id
-    let prjRows = _.groupBy(results.rows, row => row.id);
-    const projects = fromDbToExpress(prjRows);
-
-    for (const project of projects) {
-      const uniqTags = _.uniqBy(project.tags, function(tag){
-        return tag.id;
-      });
-
-      project.tags = uniqTags;
-
-      const uniqLikes = _.uniqBy(project.likes, function(like) {
-        return like.likeId;
-      });
-
-      // project.likes = uniqLikes;
-
-      project.likesCount = uniqLikes.length;
-      
-      // console.log("PROJECT.LIKES: ", project.likes);
-      // delete project.likes;
-      
-      const likedByCurrentUser = uniqLikes.find(like => like.likerUserId === currentUserId);
-      
-      project.currentUsersLikeId = likedByCurrentUser ? likedByCurrentUser.likeId : null;
-    }
-
-    /** FILTER */
+    /** FILTER projects */
     if (tagText) {
       projects = projects.filter(
         project => project.tags.some(
@@ -212,7 +179,7 @@ class Project {
       );
     };
     
-    /** SORT */
+    /** SORT projects */
     if (sortVariable === 'newest') {
       projects.sort((a, b) => {
         return b.createdAt - a.createdAt
