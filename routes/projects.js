@@ -141,8 +141,8 @@ router.post("/:id/likes", async function (req, res, next) {
  * Req body: none
  * 
  * Can filter on provided filters (in req.query)
- *  - username
- *  - tag
+ *  - userId
+ *  - tagName
  * 
  * Returns: 
  * 
@@ -154,12 +154,14 @@ router.post("/:id/likes", async function (req, res, next) {
 router.get('/', async function (req, res, next) {
   const currentUserId = res.locals.user.id;
   console.log("REQ.QUERY for getting projects: ", req.query);
+  const { tagText, sortVariable } = req.query;
   try {
-    const validator = jsonschema.validate(req.query, projectSearchSchema);
-
-    if (!validator.valid) {
-      const errors = validator.errors.map(error => error.stack);
-      throw new BadRequestError(errors);
+    if (tagText) {
+      const validator = jsonschema.validate(req.query, projectSearchSchema);
+      if (!validator.valid) {
+        const errors = validator.errors.map(error => error.stack);
+        throw new BadRequestError(errors);
+      }
     }
     
     const projects = await Project.getAll(currentUserId, req.query);
