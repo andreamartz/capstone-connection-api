@@ -3,14 +3,13 @@
 /** Routes for authentication */
 
 const jsonschema = require("jsonschema");
-
 const User = require("../models/user");
 const express = require("express");
 const router = new express.Router();
 const createToken = require("../helpers/tokens");
 const userAuthSchema = require("../schemas/userAuth.json");
 const userRegisterSchema = require("../schemas/userRegister.json");
-const { BadRequestError, ExpressError } = require("../expressError");
+const { BadRequestError } = require("../expressError");
 const imageUpload = require("../helpers/imageUpload");
 
 /** POST /auth/token
@@ -63,12 +62,12 @@ router.post("/token", async function(req, res, next) {
  * Authorization required: none
  */
 
- router.post("/register", async function (req, res, next) {
-   console.debug("REGISTER A USER");
+router.post("/register", async function (req, res, next) {
+  console.debug("REGISTER A USER");
   try {
     const fileStr = req.body.photoUrl;
     let photoUrl;
-    // upload image to Cloudinary
+    // upload encoded image to Cloudinary
     if (fileStr) {
       const imageData = await imageUpload(fileStr);
       photoUrl = imageData.secure_url;
