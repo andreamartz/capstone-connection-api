@@ -8,8 +8,7 @@ const { UnauthorizedError, ForbiddenError } = require("../expressError");
 
 /** Middleware: Authenticate user.
  *
- * If a token was provided, verify it, and, if valid, store the token payload
- * on res.locals (this will include the username and isAdmin field.)
+ * If a token was provided, verify it, and, if valid, store the token payload on res.locals.user (this will include the username and isAdmin field.)
  *
  * It's NOT an error if either/both true:
  *  - no token was provided or
@@ -18,8 +17,6 @@ const { UnauthorizedError, ForbiddenError } = require("../expressError");
 
  function authenticateJWT(req, res, next) {
   try {
-    // console.log("INSIDE AUTHENTICATEJWT");
-    // console.log("RES.LOCALS: ", res.locals);
     const authHeader = req.headers && req.headers.authorization;
     if (authHeader) {
       const token = authHeader.replace(/^[Bb]earer /, "").trim();
