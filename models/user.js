@@ -12,8 +12,6 @@ const {
   NotFoundError,
 } = require("../expressError");
 
-
-
 /** Functions for users */
 
 class User {
@@ -166,8 +164,10 @@ class User {
         isAdmin
       ],
     );
-
+    
     const user = result.rows[0];
+
+    if (!user) throw new NotFoundError(`Could not register user. Please try again later.`)
 
     return user;
   }
@@ -195,21 +195,20 @@ class User {
   */
 
   static async getOne(userId) {
-    const queryUserId = `
-      SELECT
-        id,
-        username
-      FROM users
-      WHERE id = $1
-    `;
+    if (!userId) {
+      throw new BadRequestError('No user id was provided.');
+    }
 
-    const userIdQueryRes = await db.query(queryUserId, [userId]);
-    console.log("USERIDQUERYRES: ", userIdQueryRes);
-    // const userId = usernameRes.rows[0].id;
-    // console.log("USERNAMERES.ROWS[0].id: ", userId);
-    if (!userId) throw new NotFoundError(`No user with id ${id} was found.`);
+    // const queryUserId = `
+    //   SELECT
+    //     id,
+    //     username
+    //   FROM users
+    //   WHERE id = $1
+    // `;
 
-    
+    // const userIdQueryRes = await db.query(queryUserId, [userId]);
+
     const query = `
       SELECT 
         u.id,
@@ -237,7 +236,10 @@ class User {
     `;
 
     const userResults = await db.query(query, [userId]);
-    console.log("Number of rows in USERRESULTS.ROWS: ", userResults.rows.length);
+
+    if (userResults.rows.length === 0) {
+      throw new NotFoundError(`Could not find user with id: ${userId}.`);
+    }
 
     const projects = [];
 
@@ -249,8 +251,6 @@ class User {
       projects.push(project);
     }
 
-    // console.log("PROJECTS: ", projects);
-
     const { id, username, firstName, lastName, bio, photoUrl, portfolioUrl, gitHubUrl } = userResults.rows[0];
 
     const user = { id, username, firstName, lastName, bio, photoUrl, portfolioUrl, gitHubUrl };
@@ -259,14 +259,8 @@ class User {
 
     console.log("USER: ", user);
 
-    // Verify user exists before continuing (& throw error if not)
-
-    // if (!user) throw new NotFoundError(`No user with id ${userId} was found.`);
-
     return user;
   }
-
-
 
   /** Update user data with `data` */
   static async update(userId, data) {
