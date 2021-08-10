@@ -14,7 +14,6 @@ function createToken(user) {
     firstName: user.firstName,
     lastName: user.lastName,
     photoUrl: user.photoUrl,
-    email: user.email,
     bio: user.bio,
     portfolioUrl: user.portfolioUrl,
     gitHubUrl: user.gitHubUrl,
