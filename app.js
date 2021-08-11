@@ -28,6 +28,7 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(morgan("tiny"));
 app.use(authenticateJWT);
 
+app.options('*', cors())
 app.use("/auth", authRoutes);
 app.use("/users", usersRoutes);
 app.use("/projects", projectsRoutes);
