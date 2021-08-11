@@ -112,8 +112,7 @@
           "examples": [
               "https://andreamartz.dev/"
           ],
-          "format": "uri", 
-          "pattern": "^https?://"
+          "pattern": "^$|^https?://"
       },
       "gitHubUrl": {
           "$id": "#/properties/gitHubUrl",
@@ -124,8 +123,7 @@
           "examples": [
               "https://github.com/andreamartz"
           ],
-          "format": "uri", 
-          "pattern": "^https?://"
+          "pattern": "^$|^https?://"
       }
   },
   "additionalProperties": false
