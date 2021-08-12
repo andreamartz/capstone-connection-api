@@ -10,18 +10,12 @@ const { DB_URI } = require("./config");
 
  const db = new Client({
    connectionString: DB_URI,
-   ssl: true
+   ssl: {
+     rejectUnauthorized: false
+   }
 });
 
 console.log("DB_URI: ", DB_URI);
-// db.connect();
-
-db.connect(err => {
-  if (err) {
-    console.error('connection error', err.stack)
-  } else {
-    console.log('connected')
-  }
-})
+db.connect();
 
 module.exports = db;
