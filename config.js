@@ -5,7 +5,7 @@
 require("dotenv").config();
 
 // CHECK: is dotenv set up properly here? Do I need to require dotenv in other files?
-
+console.log("PROCESS.ENV ", process.env);
 const SECRET_KEY = process.env.SECRET_KEY;
 const PORT = +process.env.PORT;
 let DB_URI = process.env.DB_URI;
