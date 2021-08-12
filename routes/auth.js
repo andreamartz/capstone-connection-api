@@ -90,6 +90,7 @@ router.post("/register", async function (req, res, next) {
     return res.status(201).json({ token });
   } catch (err) {
     if (err.code === '23505') {
+      console.error(err);
       return next(new BadRequestError("Username taken. Please choose another."));
     }
     return next(err);
