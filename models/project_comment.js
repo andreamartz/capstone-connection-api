@@ -73,7 +73,7 @@ class Project_Comment {
     const result = await db.query(querySql, [...values, commentId]);
     const comment = result.rows[0];
 
-    if (!comment) throw new NotFoundError(`No comment found with id ${userId}`);
+    if (!comment) throw new NotFoundError(`No comment found with id ${commentId}`);
 
     return comment;
   }
