@@ -73,7 +73,7 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
  * 
  * Req.body: { projectId, likerId }
  * 
- * Returns:
+ * Returns: { id, likerId, projectId }
  * 
  * Auth required: 
  * 
@@ -93,7 +93,9 @@ router.post("/:id/likes", ensureLoggedIn, async function (req, res, next) {
 
 /** POST /:id/tags
  *  
- * Purpose: add a tag to a project
+ * Purpose: add a tag to a project as part of posting a new project.
+ * 
+ * NOTE: this route is ONLY called from the route that creates a new project.
  * 
  * Req.body: { projectId, tags: [ tagId, tagId, ... ] }
  * 
