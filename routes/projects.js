@@ -6,7 +6,7 @@ const jsonschema = require("jsonschema");
 const express = require("express");
 
 const { BadRequestError } = require("../expressError");
-const { ensureAdmin } = require("../middleware/auth");
+const { ensureLoggedIn, ensureCorrectUserOrAdminBody } = require("../middleware/auth");
 const imageUpload = require("../helpers/imageUpload");
 const Project = require("../models/project");
 const Project_Tag = require("../models/project_tag");
