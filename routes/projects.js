@@ -202,6 +202,7 @@ router.get('/:id', ensureLoggedIn, async function (req, res, next) {
 router.delete("/:id/likes/:id", ensureCorrectUserOrAdminBody, async function(req, res, next) {
   try {
 
+    // const likerId = req.body.userId;
     console.log("REQ.BODY: ", req.body);
     // const projectLike = await Project_Like.remove(req.params.id);
     const { currentUsersLikeId } = req.body;
