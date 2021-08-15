@@ -187,48 +187,6 @@ router.get('/:id', ensureLoggedIn, async function (req, res, next) {
   }
 });
 
-/** PATCH /:id
- * 
- * Purpose: update a specific project by id
- * 
- * Req body: 
- * 
- * Returns: 
- * 
- * Auth required: 
- * 
- * Errors: 
-*/
-router.patch("/:id", async function(req, res, next) {
-  try {
-    const project = await Project.update(req.params.id, req.body);
-    return res.json({ project });
-  } catch (err) {
-    return next(err);
-  }
-});
-
-/** DELETE /:id 
- * 
- * Purpose: retrieve a specific project by id
- * 
- * Req body: none
- * 
- * Returns: { deleted: id }
- * 
- * Auth required: 
- * 
- * Errors: 
-*/
-router.delete("/:id", async function(req, res, next) {
-  try {
-    await Project.remove(req.params.handle);
-    return res.json({ deleted: req.params.id });
-  } catch (err) {
-    return next(err);
-  }
-});
-
 /** DELETE /:id/likes/:id
  * 
  * Purpose: delete a like from a project
