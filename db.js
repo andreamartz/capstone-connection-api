@@ -4,15 +4,19 @@
 
 const { Client } = require("pg");
 
-// CHECK: use dotenv here?
-
 const { DB_URI } = require("./config");
 
- const db = new Client({
-   connectionString: DB_URI,
-   ssl: {
-     rejectUnauthorized: false
-   }
+// USE FOR LOCAL SERVER
+// const db = new Client({
+//   connectionString: DB_URI
+// });
+
+// USE FOR DEPLOYMENT; also, you need to add to .env file the DATABASE_URL of the deployed database (and NODE_ENV??)
+const db = new Client({
+  connectionString: DB_URI,
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
 console.log("DB_URI: ", DB_URI);
