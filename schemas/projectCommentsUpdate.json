@@ -8,13 +8,13 @@
   "examples": [
       {
           "projectId": 1,
-          "commenterId": 3,
+          "userId": 3,
           "comment": "Wow! What a project!"
       }
   ],
   "required": [
       "projectId",
-      "commenterId",
+      "userId",
       "comment"
   ],
   "properties": {
@@ -28,10 +28,10 @@
               1
           ]
       },
-      "commenterId": {
-          "$id": "#/properties/commenterId",
+      "userId": {
+          "$id": "#/properties/userId",
           "type": "integer",
-          "title": "The commenterId schema",
+          "title": "The userId schema",
           "description": "An explanation about the purpose of this instance.",
           "default": 0,
           "examples": [
