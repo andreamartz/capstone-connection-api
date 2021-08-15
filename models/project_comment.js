@@ -50,7 +50,7 @@ class Project_Comment {
     const { setCols, values } = sqlForPartialUpdate(
       data,
       {
-        commenterId: "commenter_id",
+        userId: "commenter_id",
         projectId: "project_id"
       }
     );
