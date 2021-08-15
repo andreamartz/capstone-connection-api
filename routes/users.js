@@ -8,19 +8,15 @@ const jsonschema = require("jsonschema");
 const userUpdateSchema = require("../schemas/userUpdate.json");
 
 const express = require("express");
-const { ensureCorrectUserOrAdmin, ensureAdmin } = require("../middleware/auth");
+const { ensureLoggedIn, ensureCorrectUserOrAdminParams } = require("../middleware/auth");
 const { BadRequestError } = require("../expressError");
 const User = require("../models/user");
 const Project = require("../models/project");
 const { createToken } = require("../helpers/tokens");
 
-
 // Data validation schemas
 
-
 const router = express.Router();
-
-/** POST / { user } */
 
 /** GET / */
 // router.get("/", async function (req, res, next) {
@@ -72,7 +68,7 @@ router.patch("/:id", async function (req, res, next) {
 });
 
 /** DELETE /[id] */
-// router.delete("/:id", async function (req, res, next) {
+// router.delete("/:id", ensureCorrectUserOrAdminParams, async function (req, res, next) {
 //   try {
 //     await User.remove(req.params.id);
 //     return res.json({ deleted: req.params.id });
