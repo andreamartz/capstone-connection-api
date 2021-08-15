@@ -262,7 +262,15 @@ class User {
     return user;
   }
 
-  /** Update user data with `data` */
+  /** Purpose: Update user data with `data`
+   * 
+   * Inputs: 
+   * 
+   * Returns: 
+   * 
+   * Errors: Throws UnauthorizedError if user is not found or password is wrong
+  */
+
   static async update(userId, data) {
     if (data.password) {
       data.password = await bcrypt.hash(data.password, BCRYPT_WORK_FACTOR);

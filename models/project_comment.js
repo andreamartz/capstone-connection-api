@@ -36,6 +36,16 @@ class Project_Comment {
     return project_comment;
   }
 
+  /** Purpose: update a comment 
+   * 
+   * Input: commentId,
+   *        data: { projectId, userId, comment }
+   * 
+   * Returns: { comment: {id, commentId, projectId, comment, createdAt, lastModified }}
+   * 
+   * Error(s): throws NotFoundError if comment not found
+   */
+
   static async update(commentId, data) {
     const { setCols, values } = sqlForPartialUpdate(
       data,

@@ -51,7 +51,7 @@ class Project_Like {
    * 
    * Returns: 
    * 
-   * Errors(s):
+   * Errors(s): Throws a NotFoundError if the like is not found
   */
   
   static async remove(id) {
