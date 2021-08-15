@@ -6,7 +6,7 @@ const jsonschema = require("jsonschema");
 const express = require("express");
 
 const { BadRequestError } = require("../expressError");
-const { ensureAdmin } = require("../middleware/auth");
+const { ensureLoggedIn } = require("../middleware/auth");
 const imageUpload = require("../helpers/imageUpload");
 const Tag = require("../models/tag");
 
@@ -28,7 +28,7 @@ const router = new express.Router();
  * Errors: 
  */
 
-router.get('/', async function (req, res, next) {
+router.get('/', ensureLoggedIn, async function(req, res, next) {
   try {
     const tags = await Tag.getAll(req.query);
     return res.json({ tags });
