@@ -47,10 +47,7 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
       image = "https://res.cloudinary.com/wahmof2/image/upload/v1626296156/capstone_connections/projects_capstone_connections/undraw_Website_builder_re_ii6e.svg";
     }
 
-
-    // console.log("IMAGE AFTER UPLOAD");
     req.body.image = image;
-    // console.log("REQ.BODY: ", req.body);
     
     const validator = jsonschema.validate(req.body, projectNewSchema);
     if (!validator.valid) {
@@ -202,7 +199,7 @@ router.get('/:id', ensureLoggedIn, async function (req, res, next) {
 
 router.delete("/:id/likes/:id", ensureCorrectUserOrAdminBody, async function(req, res, next) {
   try {
-    // console.log("REQ.PARAMS: ", req.params);
+
     console.log("REQ.BODY: ", req.body);
     // const projectLike = await Project_Like.remove(req.params.id);
     const { currentUsersLikeId } = req.body;
