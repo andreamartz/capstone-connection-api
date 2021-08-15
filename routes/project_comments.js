@@ -6,7 +6,7 @@ const jsonschema = require("jsonschema");
 const express = require("express");
 
 const { BadRequestError } = require("../expressError");
-const { ensureAdmin } = require("../middleware/auth");
+const { ensureLoggedIn, ensureCorrectUserOrAdminBody } = require("../middleware/auth");
 const Project_Comment = require("../models/project_comment");
 
 // Data validation schemas
@@ -27,7 +27,7 @@ const router = new express.Router();
  * 
  * Errors: 
  */
-router.post("/", async function (req, res, next) {
+router.post("/", ensureLoggedIn, async function (req, res, next) {
   console.debug("CREATE NEW COMMENT");
   try {
     const validator = jsonschema.validate(req.body, projectCommentsNewSchema);
@@ -44,19 +44,21 @@ router.post("/", async function (req, res, next) {
 });
 
 
-/** PATCH / []
+/** PATCH /[id]
  * 
  * Purpose: update a comment in the database
  * 
- * Req body: 
+ * Req.params: includes comment id
+ * 
+ * Req body: { projectId, userId, comment }
  * 
  * Returns: 
  * 
- * Auth required: 
+ * Auth required: Must be the user who posted the comment OR an admin
  * 
  * Errors: 
  */
-router.patch("/:id", async function(req, res, next) {
+router.patch("/:id", ensureCorrectUserOrAdminBody, async function(req, res, next) {
   try {
     const validator = jsonschema.validate(req.body, projectCommentsUpdateSchema);
     if (!validator.valid) {
