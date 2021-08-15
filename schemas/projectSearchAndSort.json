@@ -6,7 +6,8 @@
   "examples": [
       {
           "userId": 1,
-          "tagName": "HTML"
+          "tagText": "HTML",
+          "sortVariable": "newest"
       }
   ],
   "required": [],
@@ -26,12 +27,22 @@
       "tagText": {
           "$id": "#/properties/tagName",
           "type": "string",
-          "title": "The tagName schema",
+          "title": "The tagText schema",
           "description": "An explanation about the purpose of this instance.",
           "default": "",
           "examples": [
               "HTML"
           ]
+      },
+      "sortVariable": {
+        "$id": "#/properties/sortVariable",
+        "type": "string",
+        "title": "The sortVariable schema",
+        "description": "An explanation about the purpose of this instance.",
+        "default": "",
+        "examples": [
+            "newest"
+        ]
       }
   },
   "additionalProperties": false

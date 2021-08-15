@@ -14,7 +14,7 @@ const Project_Like = require("../models/project_like");
 
 // Data validation schemas
 const projectNewSchema = require("../schemas/projectNew.json");
-const projectSearchSchema  = require("../schemas/projectSearch.json")
+const projectSearchAndSortSchema  = require("../schemas/projectSearchAndSort.json")
 
 
 const router = new express.Router();
@@ -156,8 +156,8 @@ router.get('/', async function (req, res, next) {
   console.log("REQ.QUERY for getting projects: ", req.query);
   const { tagText, sortVariable } = req.query;
   try {
-    if (tagText) {
-      const validator = jsonschema.validate(req.query, projectSearchSchema);
+    if (tagText || sortVariable) {
+      const validator = jsonschema.validate(req.query, projectSearchAndSortSchema);
       if (!validator.valid) {
         const errors = validator.errors.map(error => error.stack);
         throw new BadRequestError(errors);
