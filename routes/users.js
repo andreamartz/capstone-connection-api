@@ -46,7 +46,7 @@ router.get("/:id", async function (req, res, next) {
 router.get("/:id/projects", async function (req, res, next) {
   try {
     const userId = req.params.id;
-    const currentUserId = res.locals.user.id;
+    const currentUserId = req.user.id;
 
     const projects = await Project.getAll(currentUserId, { userId });
     return res.json({ projects });
