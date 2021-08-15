@@ -29,7 +29,7 @@ const router = express.Router();
 // });
 
 /** GET /[id] */
-router.get("/:id", async function (req, res, next) {
+router.get("/:id", ensureLoggedIn, async function (req, res, next) {
   try {
     const user = await User.getOne(req.params.id);
     return res.json({ user });
@@ -39,7 +39,7 @@ router.get("/:id", async function (req, res, next) {
 });
 
 /** GET /[id]/projects */
-router.get("/:id/projects", async function (req, res, next) {
+router.get("/:id/projects", ensureLoggedIn, async function (req, res, next) {
   try {
     const userId = req.params.id;
     const currentUserId = req.user.id;
