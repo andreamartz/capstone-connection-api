@@ -188,11 +188,11 @@ router.get('/:id', ensureLoggedIn, async function (req, res, next) {
  * 
  * Purpose: delete a like from a project
  * 
- * Req body: { projectId, currentUsersLikeId }
+ * Req body: { projectId, currentUsersLikeId, userId }
  * 
- * Returns: 
+ * Returns: { deleted: currentUsersLikeId }
  * 
- * Auth required:
+ * Auth required: Must be a user who has already liked the project OR an admin
  * 
  * Errors:
  */
