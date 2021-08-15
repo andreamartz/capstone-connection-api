@@ -34,7 +34,7 @@ const router = new express.Router();
  * 
  * Errors: 
  */
-router.post("/", async function (req, res, next) {
+router.post("/", ensureLoggedIn, async function (req, res, next) {
   console.debug("CREATE NEW PRJ");
   try {
     const fileStr = req.body.image;
@@ -82,12 +82,8 @@ router.post("/", async function (req, res, next) {
  * 
  * Errors:
  */
-router.post("/:id/likes", async function (req, res, next) {
+router.post("/:id/likes", ensureLoggedIn, async function (req, res, next) {
   try {
-    // console.log("BACKEND REQ.BODY: ", req.body);
-    // console.log("BACKEND REQ.USER: ", req.user);
-    // console.log("BACKEND REQ.LOCALS: ", req.locals);
-    // console.log("BACKEND REQ.AUTH: ", req.auth);
     console.log("BACKEND REQ.AUTHORIZATION: ", req.authorization);
 
     const projectLike = await Project_Like.create(req.body);
@@ -117,12 +113,8 @@ router.post("/:id/likes", async function (req, res, next) {
  * Errors:
  */
 
- router.post("/:id/tags", async function (req, res, next) {
+ router.post("/:id/tags", ensureLoggedIn, async function (req, res, next) {
   try {
-    // console.log("BACKEND REQ.BODY: ", req.body);
-    // console.log("BACKEND REQ.USER: ", req.user);
-    // console.log("BACKEND REQ.LOCALS: ", req.locals);
-    // console.log("BACKEND REQ.AUTH: ", req.auth);
     console.log("BACKEND REQ.BODY: ", req.body);
     const projectId = req.params.id;
 
@@ -151,8 +143,8 @@ router.post("/:id/likes", async function (req, res, next) {
  * Errors: 
  */
 
-router.get('/', async function (req, res, next) {
-  const currentUserId = res.locals.user.id;
+router.get('/', ensureLoggedIn, async function (req, res, next) {
+  const currentUserId = req.user.id;
   console.log("REQ.QUERY for getting projects: ", req.query);
   const { tagText, sortVariable } = req.query;
   try {
@@ -185,9 +177,9 @@ router.get('/', async function (req, res, next) {
  * Errors: 
 */
 
-router.get('/:id', async function (req, res, next) {
+router.get('/:id', ensureLoggedIn, async function (req, res, next) {
   try {
-    const currentUserId = res.locals.user.id;
+    const currentUserId = req.user.id;
     const project = await Project.getOne(currentUserId, req.params.id);
     return res.json({ project });
   } catch (err) {
@@ -250,7 +242,7 @@ router.delete("/:id", async function(req, res, next) {
  * Errors:
  */
 
-router.delete("/:projectId/likes/:currentUsersLikeId", async function(req, res, next) {
+router.delete("/:id/likes/:id", ensureCorrectUserOrAdminBody, async function(req, res, next) {
   try {
     // console.log("REQ.PARAMS: ", req.params);
     console.log("REQ.BODY: ", req.body);
