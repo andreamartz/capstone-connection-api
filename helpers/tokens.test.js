@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const { createToken } = require("./tokens");
+const createToken = require("./tokens");
 const { SECRET_KEY } = require("../config");
 
 describe("createToken", function () {
@@ -23,7 +23,7 @@ describe("createToken", function () {
     });
   });
 
-  test("Creates a token for a regular user", function () {
+  test("Creates a token for a regular user when isAdmin property not passed", function () {
     // given the security risk if this didn't work, checking this specifically
     const token = createToken({ username: "test" });
     const payload = jwt.verify(token, SECRET_KEY);
