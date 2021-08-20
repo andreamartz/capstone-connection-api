@@ -24,6 +24,19 @@ const u2Data = {
   isAdmin: false
 };
 
+const adminData = { 
+  username: "admin",
+  password: "adminPassword",
+  firstName: "AdminF",
+  lastName: "AdminL",
+  email: "admin@admin.com",
+  bio: "I am AdminF, a self-taught developer",
+  photoUrl: "https://res.cloudinary.com/wahmof2/image/upload/v1628101940/capstone_connections/users_capstone_connections/Aimee-Wildstone.jpg",
+  portfolioUrl: "https://luciacerchie.dev/",
+  gitHubUrl: "https://github.com/andreamartz",
+  isAdmin: true
+};
+
 const p1Data= {
   name: "Project 1",
   description: "This is Project 1, created by u1",
@@ -46,12 +59,22 @@ const p2Data = {
   siteUrl: "https://debrakayeelliott.com/"
 }
 
+const c1Data = {
+  projectId: 1,
+  commenterId: 2,
+  comment: "My comment"
+}
+
 const pt1Data = { projectId: 1, tags: [3, 4] };
 const pt2Data = { projectId: 2, tags: [1, 2] };
 
 module.exports = {
   u1Data,
   u2Data,
+  adminData,
   p1Data,
-  p2Data
+  p2Data,
+  c1Data,
+  pt1Data,
+  pt2Data
 }

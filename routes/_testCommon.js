@@ -5,7 +5,7 @@ process.env.NODE_ENV = "test" // must come before import of db.js
 const db = require("../db.js");
 const request = require("supertest");
 const app = require("../app");
-const { u1Data, u2Data, p1Data, p2Data, pt1Data } = require("./_testCommonData");
+const { u1Data, u2Data, p1Data, p2Data, c1Data, adminData, pt1Data } = require("./_testCommonData");
 const { BCRYPT_WORK_FACTOR, DB_URI } = require("../config");
 const User = require("../models/user");
 const Project = require("../models/project");
@@ -15,8 +15,11 @@ const Project_Like = require("../models/project_like");
 const Project_Tag = require("../models/project_tag");
 const createToken = require("../helpers/tokens");
 
-let u1, u2;
+let u1, u2, admin;
 let p1, p2;
+let c1;
+let t1, t2, t3, t4;
+let pt1, pt2;
 
 
 async function commonBeforeAll() {
@@ -29,21 +32,34 @@ async function commonBeforeAll() {
   await db.query("SELECT setval(pg_get_serial_sequence('users', 'id'), 1, false) FROM users");
   await db.query("DELETE FROM users");
 
+  await db.query("SELECT setval(pg_get_serial_sequence('projects_tags', 'id'), 1, false) FROM projects_tags");
+  await db.query("DELETE FROM projects_tags");
 
+  await db.query("SELECT setval(pg_get_serial_sequence('tags', 'id'), 1, false) FROM tags");
+  await db.query("DELETE FROM tags");
 
-  // await db.query("DELETE FROM tags");
-  // await db.query("DELETE FROM project_likes");
-  // await db.query("DELETE FROM project_comments");
-  // await db.query("DELETE FROM projects_tags");
+  await db.query("SELECT setval(pg_get_serial_sequence('project_likes', 'id'), 1, false) FROM project_likes");
+  await db.query("DELETE FROM project_likes");
+
+  await db.query("SELECT setval(pg_get_serial_sequence('project_comments', 'id'), 1, false) FROM project_comments");
+  await db.query("DELETE FROM project_comments");
+
 
   u1 = await User.register(u1Data);
   u2 = await User.register(u2Data);
-  console.log("U1: ", u1, "U2: ", u2);
+
+  t1 = await Tag.create({text: 'HTML'});
+  t2 = await Tag.create({text: 'CSS'});
+  t3 = await Tag.create({text: 'JS'});
+  t4 = await Tag.create({text: 'API'});
 
   p1 = await Project.create(p1Data);
   p2 = await Project.create(p2Data);
-  pt1 = await Project_Tag.create(pt1Data);
-  console.log("P1: ", p1, "P2: ", p2);
+  
+  c1 = await Project_Comment.create(c1Data);
+  
+  pt1 = await Project_Tag.create(1, p1Data.tags);
+  pt2 = await Project_Tag.create(2, p2Data.tags);
 };
 
 async function commonBeforeEach() {
@@ -60,10 +76,7 @@ async function commonAfterAll() {
 
 const u1Token = createToken({ u1 });
 const u2Token = createToken({ u2 });
-const adminToken = createToken({
-  username: "admin", 
-  isAdmin: true 
-});
+const adminToken = createToken(adminData);
 
 module.exports = {
   commonBeforeAll,

@@ -88,6 +88,24 @@ describe("getAll", function() {
   });
 });
 
+describe("create", function() {
+  test("Create a new project", async function() {
+    const newProject = { 
+      name: 'p3',
+      description: 'p3 desc',
+      creatorId: 1, 
+      image: null,
+      tags: [ 1, 2, 3, 4 ],
+      repoUrl: 'https://github.com/andreamartz/capstone-connection',
+      siteUrl: 'https://andreamartz.dev/',
+      feedbackRequest: 'Tell me everything!' 
+    };
+    await Project.create(newProject);
+    const projects = await Project.getAll();
+    expect(projects).toHaveLength(3);
+  })
+})
+
 describe("remove", function() {
   test("Delete project 1 and then delete project 2", async function() {
     await Project.remove(1);
