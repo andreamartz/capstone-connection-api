@@ -16,7 +16,7 @@ const { projectsFromDbToExpress } = require("../helpers/projectsSqlToExpress");
 class Project {
   /** Purpose: to create a project (from data), update database, return new project data
    * 
-   * Input: { name, creatorId, image, repoUrl, description }
+   * Input: { name, description, creatorId, image, repoUrl, siteUrl, feedbackRequest }
    * 
    * Returns:
    *   {
