@@ -46,7 +46,7 @@ class Project_Tag {
         ]
         );
         const project_tag = result.rows[0];
-        console.log(project_tag);
+        console.log("PROJECT_TAG: ", project_tag);
         return project_tag;
       })
     );
