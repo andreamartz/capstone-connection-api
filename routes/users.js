@@ -12,7 +12,7 @@ const { ensureLoggedIn, ensureCorrectUserOrAdminParams } = require("../middlewar
 const { BadRequestError } = require("../expressError");
 const User = require("../models/user");
 const Project = require("../models/project");
-const { createToken } = require("../helpers/tokens");
+// const { createToken } = require("../helpers/tokens");
 
 // Data validation schemas
 
@@ -32,6 +32,7 @@ const router = express.Router();
 router.get("/:id", ensureLoggedIn, async function (req, res, next) {
   try {
     const user = await User.getOne(req.params.id);
+    console.log("INSIDE GET users/:id ", "USER: ", user);
     return res.json({ user });
   } catch (err) {
     return next(err);
