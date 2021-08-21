@@ -115,8 +115,9 @@ router.post("/:id/likes", ensureLoggedIn, async function (req, res, next) {
 
  router.post("/:id/tags", ensureLoggedIn, async function (req, res, next) {
   try {
-    console.log("BACKEND REQ.BODY: ", req.body);
+    console.log("BACKEND REQ.BODY: ", req.body, "REQ.USER: ", req.user);
     const projectId = req.params.id;
+    const { tags } = req.body;
 
     const projectTag = await Project_Tag.create(projectId, tags);
 
