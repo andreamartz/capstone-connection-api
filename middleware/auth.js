@@ -70,7 +70,7 @@ function ensureAdmin(req, res, next) {
 function ensureCorrectUserOrAdminBody(req, res, next) {
   try {
     const user = req.user;
-    if (!(user && (user.isAdmin || user.id === req.body.userId))) {
+    if (!(user && (user.isAdmin || user.id === +req.body.userId))) {
       throw new UnauthorizedError();
     }
     return next();
@@ -88,7 +88,6 @@ function ensureCorrectUserOrAdminParams(req, res, next) {
   try {
     const user = req.user;
 
-    console.log("USER: ", user);
     if (!(user && (user.isAdmin || user.id === +req.params.id))) {
       throw new UnauthorizedError();
     }
