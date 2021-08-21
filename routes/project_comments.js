@@ -19,11 +19,15 @@ const router = new express.Router();
  * 
  * Purpose: create a new comment and save to database
  * 
- * Req body:  { comment }
+ * Req body:  { projectId, commenterId, comment }
  * 
- * Returns: 
+ * Returns: {
+    comment: {
+      id, commenterId, projectId, comment, createdAt, lastModified
+    }
+  }
  * 
- * Auth required: 
+ * Auth required: Must be logged in
  * 
  * Errors: 
  */
