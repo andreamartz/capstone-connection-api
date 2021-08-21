@@ -25,12 +25,11 @@ const router = new express.Router();
  * - requests to create a new project with the image in dtbs
  * - requests to add tags to the project in dtbs
  * 
- * 
  * Req body:  { project }
  * 
  * Returns: 
  * 
- * Auth required: 
+ * Auth required: User must be logged in
  * 
  * Errors: 
  */
@@ -97,7 +96,9 @@ router.post("/:id/likes", ensureLoggedIn, async function (req, res, next) {
  * 
  * NOTE: this route is ONLY called from the route that creates a new project.
  * 
- * Req.body: { projectId, tags: [ tagId, tagId, ... ] }
+ * Req.params: the project id is in the path
+ * 
+ * Req.body: { tags: [ tagId, tagId, ... ] }
  * 
  * Returns:
  *   {
