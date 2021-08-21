@@ -5,9 +5,9 @@ const { SECRET_KEY } = require("../config");
 
 function createToken(user) {
   // write an 'error' message to the console if user has no isAdmin property
+  console.log("USER TO CREATE TOKEN FOR: ", user);
   console.assert(user.isAdmin !== undefined,
     "createToken passed user without isAdmin property");
-  console.log("SECRET_KEY ", SECRET_KEY);
   let payload = {
     id: user.id,
     username: user.username,
@@ -19,7 +19,7 @@ function createToken(user) {
     gitHubUrl: user.gitHubUrl,
     isAdmin: user.isAdmin || false,
   };
-
+  console.log("TOKEN: ", jwt.sign(payload, SECRET_KEY));
   return jwt.sign(payload, SECRET_KEY);
 }
 
