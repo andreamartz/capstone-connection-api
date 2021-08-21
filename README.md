@@ -14,7 +14,8 @@ Start the server by running `node server.js`
 
 ## Testing
 
-To run tests, run `npm test`
+Tests are written using Jest and Supertest.
+To run tests, run `npm test` at the command line.
 
 ## Authentication and authorization
 
