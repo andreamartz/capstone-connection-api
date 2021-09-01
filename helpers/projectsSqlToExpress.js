@@ -17,9 +17,9 @@ const _ = require('lodash');
  * Purpose: fromDbToExpress reduces each project array down to a single object and pushes it onto a new array, called 'projects', which is returned from the function.
  */
 
-const projectsFromDbToExpress = (results, currentUserId) => {
+const projectsSqlToExpress = (results, currentUserId) => {
   const projects = [];
-
+  // console.log("RESULTS FROM project model: ", results);
   // Group results data by project id
   const prjRows = _.groupBy(results.rows, row => row.id);
 
@@ -96,8 +96,8 @@ const projectsFromDbToExpress = (results, currentUserId) => {
     ? likedByCurrentUser.likeId
     : null;
   }
-
+  // console.log("PROJECTS: ", projects);
   return projects;
 }
 
-module.exports = { projectsFromDbToExpress };
+module.exports = { projectsSqlToExpress };

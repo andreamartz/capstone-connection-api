@@ -9,7 +9,7 @@ const {
   NotFoundError,
 } = require("../expressError");
 const { sqlForPartialUpdate } = require("../helpers/sql");
-const { projectsFromDbToExpress } = require("../helpers/projectsSqlToExpress");
+const { projectsSqlToExpress } = require("../helpers/projectsSqlToExpress");
 
 /** Functions for projects */
 
@@ -123,6 +123,10 @@ class Project {
    */
 
   static async getAll(currentUserId, filterParams = {}) {
+    const whereExpressions = [];
+    const queryValues = [];
+    const { userId, tagText, sortVariable } = filterParams;
+    
     let query = `
       SELECT 
         p.id,
@@ -154,30 +158,32 @@ class Project {
       ON pl.project_id = p.id
     `;
     
-    const whereExpressions = [];
-    const queryValues = [];
-    const { userId, tagText, sortVariable } = filterParams;
-
-    // if userId passed, get the projects for a specific user
+    // set up SQL filter for a specific userId
     if (userId) {
       queryValues.push(userId);
       whereExpressions.push(`u.id = $${queryValues.length}`);
     };
+
+    // set up SQL filter for a specific tag
+    if (tagText) {
+      queryValues.push(tagText.toUpperCase());
+      whereExpressions.push(`p.id IN (
+        SELECT pt.project_id FROM projects_tags pt
+          WHERE pt.tag_id IN (
+            SELECT id FROM tags
+              WHERE tags.text = $${queryValues.length}
+          )
+        )`
+      );
+    }
+
     if (whereExpressions.length) {
       query += " WHERE " + whereExpressions.join(' AND ');
     }
 
     const results = await db.query(query, queryValues);
-    let projects = projectsFromDbToExpress(results, currentUserId);
+    let projects = projectsSqlToExpress(results, currentUserId);
 
-    /** FILTER projects */
-    if (tagText) {
-      projects = projects.filter(
-        project => project.tags.some(
-          tag => tag.text === tagText.toUpperCase()
-        )
-      );
-    };
     
     /** SORT projects */
     if (sortVariable === 'newest') {
