@@ -1,35 +1,35 @@
-"use strict";
+'use strict';
 
 const _ = require('lodash');
-const db = require("../db");
+const db = require('../db');
 const {
   BadRequestError,
   UnauthorizedError,
   ForbiddenError,
   NotFoundError,
-} = require("../expressError");
-const { sqlForPartialUpdate } = require("../helpers/sql");
-const { projectsSqlToExpress } = require("../helpers/projectsSqlToExpress");
+} = require('../expressError');
+const { sqlForPartialUpdate } = require('../helpers/sql');
+const { projectsSqlToExpress } = require('../helpers/projectsSqlToExpress');
 
 /** Functions for projects */
 
 class Project {
   /** Purpose: to create a project (from data), update database, return new project data
-   * 
+   *
    * Input: { name, description, creatorId, image, repoUrl, siteUrl, feedbackRequest }
-   * 
+   *
    * Returns:
    *   {
    *     project: {
    *        id,
    *        name,
    *        creatorId,
-   *        image, 
-   *        repoUrl, 
+   *        image,
+   *        repoUrl,
    *        siteUrl
-   *        description, 
+   *        description,
    *        feedbacRequest
-   *        createdAt, 
+   *        createdAt,
    *        lastModified,
    *        creator: {
    *          firstName,
@@ -43,11 +43,12 @@ class Project {
    *        ]
    *     },
    *   }
-   * Error(s): 
+   * Error(s):
    */
 
-   static async create(data) {
-    const defaultImageUrl = "https://res.cloudinary.com/wahmof2/image/upload/v1626296156/capstone_connections/undraw_Website_builder_re_ii6e.svg";
+  static async create(data) {
+    const defaultImageUrl =
+      'https://res.cloudinary.com/wahmof2/image/upload/v1626296156/capstone_connections/undraw_Website_builder_re_ii6e.svg';
 
     const result = await db.query(
       `INSERT INTO projects (
@@ -68,7 +69,7 @@ class Project {
         data.image || defaultImageUrl,
         data.repoUrl,
         data.siteUrl,
-        data.feedbackRequest
+        data.feedbackRequest,
       ]
     );
 
@@ -78,24 +79,23 @@ class Project {
     return project;
   }
 
-
-  /** Purpose: get all projects 
-   * 
+  /** Purpose: get all projects
+   *
    * Input: currentUserId, filterParams
-   * 
+   *
    * Returns:
    *   {
-   *     projects: [ 
+   *     projects: [
    *       {
    *         id,
    *         name,
    *         creatorId,
-   *         image, 
-   *         repoUrl, 
+   *         image,
+   *         repoUrl,
    *         siteUrl,
-   *         description, 
+   *         description,
    *         feedbackRequest,
-   *         createdAt, 
+   *         createdAt,
    *         lastModified,
    *         prjLikesCount,
    *         prjCommentsCount,
@@ -118,15 +118,16 @@ class Project {
    *       }
    *     ]
    *   }
-   * 
-   * Error(s): 
+   *
+   * Error(s):
    */
 
   static async getAll(currentUserId, filterParams = {}) {
     const whereExpressions = [];
     const queryValues = [];
+    const sortExpressions = [];
     const { userId, tagText, sortVariable } = filterParams;
-    
+
     let query = `
       SELECT 
         p.id,
@@ -157,12 +158,12 @@ class Project {
       LEFT JOIN project_likes AS pl
       ON pl.project_id = p.id
     `;
-    
+
     // set up SQL filter for a specific userId
     if (userId) {
       queryValues.push(userId);
       whereExpressions.push(`u.id = $${queryValues.length}`);
-    };
+    }
 
     // set up SQL filter for a specific tag
     if (tagText) {
@@ -173,86 +174,104 @@ class Project {
             SELECT id FROM tags
               WHERE tags.text = $${queryValues.length}
           )
-        )`
-      );
+        )`);
     }
 
     if (whereExpressions.length) {
-      query += " WHERE " + whereExpressions.join(' AND ');
+      query += ' WHERE ' + whereExpressions.join(' AND ');
     }
 
+    // set up ordering of results
+    // if (sortVariable === 'newest') {
+    //   sortExpressions.push('p.created_at DESC');
+    // }
+
+    // if (sortVariable === 'most likes') {
+    //   sortExpressions.push('p.likesCount DESC');
+    // }
+
+    // if (sortExpressions.length) {
+    //   query += " ORDER BY " + sortExpressions.join(', ');
+    // }
+
+    // console.log("QUERY: ", query);
+
     const results = await db.query(query, queryValues);
+
+    // console.log("RESULTS FROM GETALL: ", results.rows);
+
+    // console.log('PROJECT RESULTS INPUT TO SQLTOEXPRESS FCN: ', results.rows);
     let projects = projectsSqlToExpress(results, currentUserId);
 
-    
     /** SORT projects */
     if (sortVariable === 'newest') {
       projects.sort((a, b) => {
-        return b.createdAt - a.createdAt
+        return b.createdAt - a.createdAt;
       });
     } else if (sortVariable === 'most likes') {
       projects.sort((a, b) => {
-        return b.likesCount - a.likesCount
-      }); 
+        return b.likesCount - a.likesCount;
+      });
       for (let project of projects) {
-        console.log("PRJ ID: ", project.id, "PRJ LIKES: ", project.likesCount);
+        console.log('PRJ ID: ', project.id, 'PRJ LIKES: ', project.likesCount);
       }
     }
 
+    // console.log("PROJECTS FROM GETALL: ", projects);
     return projects;
   }
 
   /** Purpose: get a project by id
-  * 
-  * Input: none
-  * 
-  * Returns:
-  *   {
-  *     project: {
-  *       id,
-  *       name,
-  *       image, 
-  *       repoUrl, 
-  *       siteUrl,
-  *       description, 
-  *       feedbackRequest,
-  *       createdAt, 
-  *       lastModified,
-  *       creator: {
-  *         creatorId,
-  *         firstName,
-  *         lastName,
-  *         photoUrl
-  *       },
-  *       tags: [
-  *         { id, text },
-  *         ...
-  *       ],
-  *       likesCount, 
-  *       currentUsersLikeId,
-  *       comments: [
-  *         {
-  *           id,
-  *           comment,
-  *           commentCreatedAt,
-  *           commentLastModified,
-  *           commentLikesCount,
-  *           commenter: {
-  *             commenterId,
-  *             firstName,
-  *             lastName,
-  *             photoUrl
-  *           }
-  *         },
-  *         {
-  *           ...
-  *         }
-  *       ]
-  *     } 
-  *   }
-  *  
-  *  Error(s): 
-  */
+   *
+   * Input: none
+   *
+   * Returns:
+   *   {
+   *     project: {
+   *       id,
+   *       name,
+   *       image,
+   *       repoUrl,
+   *       siteUrl,
+   *       description,
+   *       feedbackRequest,
+   *       createdAt,
+   *       lastModified,
+   *       creator: {
+   *         creatorId,
+   *         firstName,
+   *         lastName,
+   *         photoUrl
+   *       },
+   *       tags: [
+   *         { id, text },
+   *         ...
+   *       ],
+   *       likesCount,
+   *       currentUsersLikeId,
+   *       comments: [
+   *         {
+   *           id,
+   *           comment,
+   *           commentCreatedAt,
+   *           commentLastModified,
+   *           commentLikesCount,
+   *           commenter: {
+   *             commenterId,
+   *             firstName,
+   *             lastName,
+   *             photoUrl
+   *           }
+   *         },
+   *         {
+   *           ...
+   *         }
+   *       ]
+   *     }
+   *   }
+   *
+   *  Error(s):
+   */
 
   static async getOne(currentUserId, id) {
     const prjQuery = `
@@ -284,55 +303,89 @@ class Project {
     // (SELECT COUNT(*) FROM project_likes AS pl WHERE p.id = pl.project_id) AS "likesCount"
 
     const projectRes = await db.query(prjQuery, [id]);
-    console.log("PROJECTRES.ROWS[0]: ", projectRes.rows[0]);
+    console.log('PROJECTRES.ROWS[0]: ', projectRes.rows[0]);
     let projectRows = projectRes.rows;
     // Verify project exists before continuing (& throw error if not)
     if (!projectRows[0]) throw new NotFoundError(`No project ${id} was found.`);
-    
 
-    const project = projectRows.reduce((accumulator, data) => {
-      const { id, name, creatorId, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified, username, firstName, lastName, photoUrl, likeId, likerUserId } = data;
+    const project = projectRows.reduce(
+      (accumulator, data) => {
+        const {
+          id,
+          name,
+          creatorId,
+          image,
+          repoUrl,
+          siteUrl,
+          description,
+          feedbackRequest,
+          createdAt,
+          lastModified,
+          username,
+          firstName,
+          lastName,
+          photoUrl,
+          likeId,
+          likerUserId,
+        } = data;
 
-      const newRecord = {id, name, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified 
-      };
+        const newRecord = {
+          id,
+          name,
+          image,
+          repoUrl,
+          siteUrl,
+          description,
+          feedbackRequest,
+          createdAt,
+          lastModified,
+        };
 
-      newRecord.creator = { ...accumulator.creator, 
-        id: creatorId,
-        username,
-        firstName,
-        lastName,
-        photoUrl
-      };
+        newRecord.creator = {
+          ...accumulator.creator,
+          id: creatorId,
+          username,
+          firstName,
+          lastName,
+          photoUrl,
+        };
 
-      if (likeId) {
-        newRecord.likes = [...accumulator.likes, {likeId, likerUserId}];
-      } else {
-        newRecord.likes = [...accumulator.likes]
+        if (likeId) {
+          newRecord.likes = [...accumulator.likes, { likeId, likerUserId }];
+        } else {
+          newRecord.likes = [...accumulator.likes];
+        }
+
+        return newRecord;
+      },
+      {
+        id,
+        name: '',
+        image: '',
+        repoUrl: '',
+        siteUrl: '',
+        description: '',
+        feedbackRequest: '',
+        createdAt: '',
+        lastModified: '',
+        creator: {},
+        likes: [],
       }
-      
-      return newRecord;
-    }, { id,
-      name: "",
-      image: "",
-      repoUrl: "",
-      siteUrl: "",
-      description: "",
-      feedbackRequest: "",
-      createdAt: "",
-      lastModified: "",
-      creator: {},
-      likes: []
-    });
+    );
 
     // console.log("PROJECT: ", project);
-    
+
     project.likesCount = project.likes.length;
 
-    const likedByCurrentUser = project.likes.find(like => like.likerUserId === currentUserId);
+    const likedByCurrentUser = project.likes.find(
+      (like) => like.likerUserId === currentUserId
+    );
 
     delete project.likes;
 
-    project.currentUsersLikeId = likedByCurrentUser ? likedByCurrentUser.likeId : null;
+    project.currentUsersLikeId = likedByCurrentUser
+      ? likedByCurrentUser.likeId
+      : null;
 
     // Verify project exists before continuing (& throw error if not)
     if (!project) throw new NotFoundError(`No project ${id} was found.`);
@@ -353,7 +406,6 @@ class Project {
 
     project.tags = projectsTagsRes.rows;
 
-    
     // Query to get project's comments
     const commentsQuery = `
       SELECT 
@@ -370,61 +422,57 @@ class Project {
       ON u.id = pc.commenter_id
       WHERE pc.project_id = $1
       ORDER BY pc.created_at DESC
-      `;
-    
-      const commentsRes = await db.query(commentsQuery, [id]);
-      const comments = commentsRes.rows.map(c => (
-        {
-          id: c.id,
-          comment: c.comment,
-          commentCreatedAt: c.commentCreatedAt,
-          commentLastModified: c.commentLastModified,
-          commenter: {
-            id: c.commenterId,
-            firstName: c.firstName,
-            lastName: c.lastName,
-            photoUrl: c.photoUrl
-          }
-        }
-      ));
+    `;
 
-      project.comments = comments;
+    const commentsRes = await db.query(commentsQuery, [id]);
+    const comments = commentsRes.rows.map((c) => ({
+      id: c.id,
+      comment: c.comment,
+      commentCreatedAt: c.commentCreatedAt,
+      commentLastModified: c.commentLastModified,
+      commenter: {
+        id: c.commenterId,
+        firstName: c.firstName,
+        lastName: c.lastName,
+        photoUrl: c.photoUrl,
+      },
+    }));
 
-      // console.log("PROJECT: ", project);
+    project.comments = comments;
+
+    // console.log("PROJECT: ", project);
 
     return project;
   }
 
- /** Purpose: update a project with `data`
-  * 
-  * Input: 
-  * 
-  * Returns:
-  *   {
-  *     project: {
-  *     } 
-  *   }
-  *  
-  *  Error(s): 
-  */
+  /** Purpose: update a project with `data`
+   *
+   * Input:
+   *
+   * Returns:
+   *   {
+   *     project: {
+   *     }
+   *   }
+   *
+   *  Error(s):
+   */
 
-  static async update(id, data) {
-    
-  }
+  static async update(id, data) {}
 
-   /** Purpose: delete a project
-  * 
-  * Input: 
-  * 
-  * Returns:
-  *   {
-  *     project: {
-  *     } 
-  *   }
-  *  
-  *  Error(s): 
-  */
- 
+  /** Purpose: delete a project
+   *
+   * Input:
+   *
+   * Returns:
+   *   {
+   *     project: {
+   *     }
+   *   }
+   *
+   *  Error(s):
+   */
+
   static async remove(id) {
     const query = `
       DELETE
@@ -435,11 +483,8 @@ class Project {
     const result = await db.query(query, [id]);
     const project = result.rows[0];
 
-    if (!project) throw new NotFoundError(`No project ${id} was found.`)
+    if (!project) throw new NotFoundError(`No project ${id} was found.`);
   }
-
 }
-
-
 
 module.exports = Project;
