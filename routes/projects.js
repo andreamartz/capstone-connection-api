@@ -7,8 +7,8 @@ const express = require('express');
 
 const { BadRequestError } = require('../expressError');
 const {
-	ensureLoggedIn,
-	ensureCorrectUserOrAdminBody,
+  ensureLoggedIn,
+  ensureCorrectUserOrAdminBody,
 } = require('../middleware/auth');
 const imageUpload = require('../helpers/imageUpload');
 const Project = require('../models/project');
@@ -36,37 +36,37 @@ const router = new express.Router();
  * Errors:
  */
 router.post('/', ensureLoggedIn, async function (req, res, next) {
-	console.debug('CREATE NEW PRJ');
-	try {
-		const fileStr = req.body.image;
-		let image;
-		// upload image to Cloudinary
-		if (fileStr) {
-			const imageData = await imageUpload(fileStr);
-			image = imageData.secure_url;
-		} else {
-			image =
-				'https://res.cloudinary.com/wahmof2/image/upload/v1626296156/capstone_connections/projects_capstone_connections/undraw_Website_builder_re_ii6e.svg';
-		}
+  console.debug('CREATE NEW PRJ');
+  try {
+    const fileStr = req.body.image;
+    let image;
+    // upload image to Cloudinary
+    if (fileStr) {
+      const imageData = await imageUpload(fileStr);
+      image = imageData.secure_url;
+    } else {
+      image =
+        'https://res.cloudinary.com/wahmof2/image/upload/v1626296156/capstone_connections/projects_capstone_connections/undraw_Website_builder_re_ii6e.svg';
+    }
 
-		req.body.image = image;
+    req.body.image = image;
 
-		const validator = jsonschema.validate(req.body, projectNewSchema);
-		if (!validator.valid) {
-			const errors = validator.errors.map((error) => error.stack);
-			throw new BadRequestError(errors);
-		}
+    const validator = jsonschema.validate(req.body, projectNewSchema);
+    if (!validator.valid) {
+      const errors = validator.errors.map((error) => error.stack);
+      throw new BadRequestError(errors);
+    }
 
-		const project = await Project.create(req.body);
-		console.log('PROJECT BEFORE ADDING TAGS: ', project);
+    const project = await Project.create(req.body);
+    console.log('PROJECT BEFORE ADDING TAGS: ', project);
 
-		const prjTags = await Project_Tag.create(project.id, req.body.tags);
-		project.tags = prjTags;
+    const prjTags = await Project_Tag.create(project.id, req.body.tags);
+    project.tags = prjTags;
 
-		return res.status(201).json({ project });
-	} catch (error) {
-		return next(error);
-	}
+    return res.status(201).json({ project });
+  } catch (error) {
+    return next(error);
+  }
 });
 
 /** POST /:id/likes
@@ -82,15 +82,15 @@ router.post('/', ensureLoggedIn, async function (req, res, next) {
  * Errors:
  */
 router.post('/:id/likes', ensureLoggedIn, async function (req, res, next) {
-	try {
-		console.log('BACKEND REQ.AUTHORIZATION: ', req.authorization);
+  try {
+    console.log('BACKEND REQ.AUTHORIZATION: ', req.authorization);
 
-		const projectLike = await Project_Like.create(req.body);
+    const projectLike = await Project_Like.create(req.body);
 
-		return res.status(201).json({ projectLike });
-	} catch (err) {
-		return next(err);
-	}
+    return res.status(201).json({ projectLike });
+  } catch (err) {
+    return next(err);
+  }
 });
 
 /** POST /:id/tags
@@ -117,17 +117,17 @@ router.post('/:id/likes', ensureLoggedIn, async function (req, res, next) {
  */
 
 router.post('/:id/tags', ensureLoggedIn, async function (req, res, next) {
-	try {
-		console.log('BACKEND REQ.BODY: ', req.body, 'REQ.USER: ', req.user);
-		const projectId = req.params.id;
-		const { tags } = req.body;
+  try {
+    console.log('BACKEND REQ.BODY: ', req.body, 'REQ.USER: ', req.user);
+    const projectId = req.params.id;
+    const { tags } = req.body;
 
-		const projectTag = await Project_Tag.create(projectId, tags);
+    const projectTag = await Project_Tag.create(projectId, tags);
 
-		return res.status(201).json({ projectTag });
-	} catch (err) {
-		return next(err);
-	}
+    return res.status(201).json({ projectTag });
+  } catch (err) {
+    return next(err);
+  }
 });
 
 /** GET /
@@ -148,27 +148,27 @@ router.post('/:id/tags', ensureLoggedIn, async function (req, res, next) {
  */
 
 router.get('/', ensureLoggedIn, async function (req, res, next) {
-	const currentUserId = req.user.id;
-	console.log('REQ.QUERY for getting projects: ', req.query);
-	const { tagText, sortVariable } = req.query;
-	try {
-		if (tagText || sortVariable) {
-			const validator = jsonschema.validate(
-				req.query,
-				projectSearchAndSortSchema,
-			);
-			if (!validator.valid) {
-				const errors = validator.errors.map((error) => error.stack);
-				throw new BadRequestError(errors);
-			}
-		}
+  const currentUserId = req.user.id;
+  console.log('REQ.QUERY for getting projects: ', req.query);
+  const { tagText, sortVariable } = req.query;
+  try {
+    if (tagText || sortVariable) {
+      const validator = jsonschema.validate(
+        req.query,
+        projectSearchAndSortSchema
+      );
+      if (!validator.valid) {
+        const errors = validator.errors.map((error) => error.stack);
+        throw new BadRequestError(errors);
+      }
+    }
 
-		const projects = await Project.getAll(currentUserId, req.query);
+    const projects = await Project.getAll(currentUserId, req.query);
 
-		return res.json({ projects });
-	} catch (err) {
-		return next(err);
-	}
+    return res.json({ projects });
+  } catch (err) {
+    return next(err);
+  }
 });
 
 /** GET /:id  =>  { project }
@@ -185,13 +185,13 @@ router.get('/', ensureLoggedIn, async function (req, res, next) {
  */
 
 router.get('/:id', ensureLoggedIn, async function (req, res, next) {
-	try {
-		const currentUserId = req.user.id;
-		const project = await Project.getOne(currentUserId, req.params.id);
-		return res.json({ project });
-	} catch (err) {
-		return next(err);
-	}
+  try {
+    const currentUserId = req.user.id;
+    const project = await Project.getOne(currentUserId, req.params.id);
+    return res.json({ project });
+  } catch (err) {
+    return next(err);
+  }
 });
 
 /** DELETE /:id/likes/:id
@@ -208,20 +208,20 @@ router.get('/:id', ensureLoggedIn, async function (req, res, next) {
  */
 
 router.delete(
-	'/:id/likes/:id',
-	ensureCorrectUserOrAdminBody,
-	async function (req, res, next) {
-		try {
-			// const likerId = req.body.userId;
-			console.log('REQ.BODY: ', req.body);
-			// const projectLike = await Project_Like.remove(req.params.id);
-			const { currentUsersLikeId } = req.body;
-			const projectLike = await Project_Like.remove(currentUsersLikeId);
-			return res.json({ deleted: currentUsersLikeId });
-		} catch (err) {
-			return next(err);
-		}
-	},
+  '/:id/likes/:id',
+  ensureCorrectUserOrAdminBody,
+  async function (req, res, next) {
+    try {
+      // const likerId = req.body.userId;
+      console.log('REQ.BODY: ', req.body);
+      // const projectLike = await Project_Like.remove(req.params.id);
+      const { currentUsersLikeId } = req.body;
+      const projectLike = await Project_Like.remove(currentUsersLikeId);
+      return res.json({ deleted: currentUsersLikeId });
+    } catch (err) {
+      return next(err);
+    }
+  }
 );
 
 module.exports = router;
