@@ -202,7 +202,6 @@ class Project {
 
     let projects = projectsSqlToExpress(results, currentUserId);
 
-    // console.log("PROJECTS FROM GETALL: ", projects);
     return projects;
   }
 
