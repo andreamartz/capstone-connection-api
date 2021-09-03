@@ -23,7 +23,11 @@ const _ = require('lodash');
 
 const projectsSqlToExpress = (results, currentUserId) => {
   const projects = [];
-  // console.log("RESULTS FROM project model: ", results);
+
+  const uniqueProjectIds = _.uniqBy(results.rows, 'id').map(
+    (project) => project.id
+  );
+
   // Group results data by project id
   const prjRows = _.groupBy(results.rows, (row) => row.id);
 
@@ -31,8 +35,8 @@ const projectsSqlToExpress = (results, currentUserId) => {
    * Reduce each project array down to a single project object.
    */
 
-  for (const prop in prjRows) {
-    let prjRow = prjRows[prop].reduce(
+  for (const id of uniqueProjectIds) {
+    const prjRow = prjRows[id].reduce(
       (accumulator, data) => {
         const {
           id,
@@ -49,6 +53,7 @@ const projectsSqlToExpress = (results, currentUserId) => {
           likeId,
           likerUserId,
           prjCommentsCount,
+          prjLikesCount,
           creatorId,
           firstName,
           lastName,
@@ -67,6 +72,7 @@ const projectsSqlToExpress = (results, currentUserId) => {
           createdAt,
           lastModified,
           prjCommentsCount: +prjCommentsCount,
+          likesCount: +prjLikesCount,
         };
 
         // Store project creator data in an object
@@ -90,7 +96,7 @@ const projectsSqlToExpress = (results, currentUserId) => {
         return newRecord;
       },
       {
-        id: +prop,
+        id,
         name: '',
         image: '',
         repoUrl: '',
@@ -100,6 +106,7 @@ const projectsSqlToExpress = (results, currentUserId) => {
         createdAt: '',
         lastModified: '',
         prjCommentsCount: null,
+        prjLikesCount: null,
         creator: {},
         tags: [],
         likes: [],
@@ -122,7 +129,7 @@ const projectsSqlToExpress = (results, currentUserId) => {
     const uniqLikes = _.uniqBy(project.likes, function (like) {
       return like.likeId;
     });
-    project.likesCount = uniqLikes.length;
+    project.likes = uniqLikes;
 
     // likedByCurrentUser is equal to a like object if the currentUser has liked the project; otherwise it is undefined
     const likedByCurrentUser = uniqLikes.find(

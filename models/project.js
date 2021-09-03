@@ -147,6 +147,7 @@ class Project {
         t.text AS "tagText",
         pl.id AS "likeId",
         pl.liker_id AS "likerUserId",
+        (SELECT COUNT(*) FROM project_likes AS pl WHERE p.id = pl.project_id) AS "prjLikesCount",
         (SELECT COUNT(*) FROM project_comments AS pc WHERE p.id = pc.project_id) AS "prjCommentsCount"
       FROM projects p
       LEFT JOIN users AS u
@@ -181,41 +182,25 @@ class Project {
       query += ' WHERE ' + whereExpressions.join(' AND ');
     }
 
-    // set up ordering of results
-    // if (sortVariable === 'newest') {
-    //   sortExpressions.push('p.created_at DESC');
-    // }
+    /**  SORT projects */
+    if (sortVariable === 'newest') {
+      sortExpressions.push('p.created_at DESC');
+    }
 
-    // if (sortVariable === 'most likes') {
-    //   sortExpressions.push('p.likesCount DESC');
-    // }
+    if (sortVariable === 'most likes') {
+      // sortExpressions.push('p.prjLikesCount DESC');
+      sortExpressions.push(
+        '(SELECT COUNT(*) FROM project_likes AS pl WHERE p.id = pl.project_id) DESC'
+      );
+    }
 
-    // if (sortExpressions.length) {
-    //   query += " ORDER BY " + sortExpressions.join(', ');
-    // }
-
-    // console.log("QUERY: ", query);
+    if (sortExpressions.length) {
+      query += ' ORDER BY ' + sortExpressions.join(', ');
+    }
 
     const results = await db.query(query, queryValues);
 
-    // console.log("RESULTS FROM GETALL: ", results.rows);
-
-    // console.log('PROJECT RESULTS INPUT TO SQLTOEXPRESS FCN: ', results.rows);
     let projects = projectsSqlToExpress(results, currentUserId);
-
-    /** SORT projects */
-    if (sortVariable === 'newest') {
-      projects.sort((a, b) => {
-        return b.createdAt - a.createdAt;
-      });
-    } else if (sortVariable === 'most likes') {
-      projects.sort((a, b) => {
-        return b.likesCount - a.likesCount;
-      });
-      for (let project of projects) {
-        console.log('PRJ ID: ', project.id, 'PRJ LIKES: ', project.likesCount);
-      }
-    }
 
     // console.log("PROJECTS FROM GETALL: ", projects);
     return projects;
