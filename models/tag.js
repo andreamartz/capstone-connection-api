@@ -1,24 +1,22 @@
-"use strict";
+'use strict';
 
-const db = require("../db");
+const db = require('../db');
 const {
   BadRequestError,
   UnauthorizedError,
   ForbiddenError,
   NotFoundError,
-} = require("../expressError");
-// const { sqlForPartialUpdate } = require("../helpers/sql");
-
+} = require('../expressError');
 
 /** Functions for tags */
 class Tag {
-  /** Purpose: to create a new tag 
-   * 
+  /** Purpose: to create a new tag
+   *
    * Input: { text }
-   * 
+   *
    * Returns:
    *   { tag: { id, text } }
-  */
+   */
   static async create(data) {
     const result = await db.query(
       `INSERT INTO tags (text)
@@ -33,13 +31,13 @@ class Tag {
   }
 
   /** Purpose: to get all tags
-   * 
+   *
    * Input: none
-   * 
+   *
    * Returns:
    *   {
    *     tags: [
-   *       { 
+   *       {
    *         id,
    *         text
    *       },
@@ -57,11 +55,10 @@ class Tag {
     `;
     const tagsRes = await db.query(query);
     const tags = tagsRes.rows;
-    console.log("tags: ", tags);
+    console.log('tags: ', tags);
 
     return tags;
   }
 }
-
 
 module.exports = Tag;
