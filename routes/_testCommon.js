@@ -1,19 +1,30 @@
-"use strict";
+'use strict';
 
-process.env.NODE_ENV = "test" // must come before import of db.js
+process.env.NODE_ENV = 'test'; // must come before import of db.js
 
-const db = require("../db.js");
-const request = require("supertest");
-const app = require("../app");
-const { u1Data, u2Data, p1Data, p2Data, c1Data, adminData, pt1Data } = require("./_testCommonData");
-const { BCRYPT_WORK_FACTOR, DB_URI } = require("../config");
-const User = require("../models/user");
-const Project = require("../models/project");
-const Tag = require("../models/tag");
-const Project_Comment = require("../models/project_comment");
-const Project_Like = require("../models/project_like");
-const Project_Tag = require("../models/project_tag");
-const createToken = require("../helpers/tokens");
+const db = require('../db.js');
+const request = require('supertest');
+const app = require('../app');
+const {
+  u1Data,
+  u2Data,
+  p1Data,
+  p2Data,
+  l1Data,
+  l2Data,
+  c1Data,
+  adminData,
+  pt1Data,
+  pt2Data,
+} = require('./_testCommonData');
+const { BCRYPT_WORK_FACTOR, DB_URI } = require('../config');
+const User = require('../models/user');
+const Project = require('../models/project');
+const Tag = require('../models/tag');
+const Project_Comment = require('../models/project_comment');
+const Project_Like = require('../models/project_like');
+const Project_Tag = require('../models/project_tag');
+const createToken = require('../helpers/tokens');
 
 let u1, u2, admin;
 let p1, p2;
@@ -21,9 +32,8 @@ let c1;
 let t1, t2, t3, t4;
 let pt1, pt2;
 
-
 async function commonBeforeAll() {
-  console.log("INSIDE commonBeforeAll, DB_URI: ", DB_URI);
+  console.log('INSIDE commonBeforeAll, DB_URI: ', DB_URI);
 
   // must reset id on projects & delete projects before doing the same for users;  
   await db.query("SELECT setval(pg_get_serial_sequence('projects', 'id'), 1, false) FROM projects");
@@ -48,10 +58,10 @@ async function commonBeforeAll() {
   u1 = await User.register(u1Data);
   u2 = await User.register(u2Data);
 
-  t1 = await Tag.create({text: 'HTML'});
-  t2 = await Tag.create({text: 'CSS'});
-  t3 = await Tag.create({text: 'JS'});
-  t4 = await Tag.create({text: 'API'});
+  t1 = await Tag.create({ text: 'HTML' });
+  t2 = await Tag.create({ text: 'CSS' });
+  t3 = await Tag.create({ text: 'JS' });
+  t4 = await Tag.create({ text: 'API' });
 
   p1 = await Project.create(p1Data);
   p2 = await Project.create(p2Data);
@@ -63,11 +73,11 @@ async function commonBeforeAll() {
 };
 
 async function commonBeforeEach() {
-  await db.query("BEGIN");
+  await db.query('BEGIN');
 }
 
 async function commonAfterEach() {
-  await db.query("ROLLBACK");
+  await db.query('ROLLBACK');
 }
 
 async function commonAfterAll() {
