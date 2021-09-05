@@ -1,10 +1,11 @@
-"use strict";
+'use strict';
 
 /** Convenience middleware to handle common auth cases in routes. */
 
-const jwt = require("jsonwebtoken");
-const { SECRET_KEY } = require("../config");
-const { UnauthorizedError, ForbiddenError } = require("../expressError");
+const jwt = require('jsonwebtoken');
+const { SECRET_KEY } = require('../config');
+const { UnauthorizedError, ForbiddenError } = require('../expressError');
+const Project_Like = require('../models/project_like');
 
 /** Middleware: Authenticate user.
  *
@@ -15,11 +16,11 @@ const { UnauthorizedError, ForbiddenError } = require("../expressError");
  *  - the token is not valid
  */
 
- function authenticateJWT(req, res, next) {
+function authenticateJWT(req, res, next) {
   try {
     const authHeader = req.headers && req.headers.authorization;
     if (authHeader) {
-      const token = authHeader.replace(/^[Bb]earer /, "").trim();
+      const token = authHeader.replace(/^[Bb]earer /, '').trim();
       req.user = jwt.verify(token, SECRET_KEY);
     }
     return next();
@@ -41,7 +42,6 @@ function ensureLoggedIn(req, res, next) {
     return next(err);
   }
 }
-
 
 /** Middleware to use when user needs to be an admin.
  *
