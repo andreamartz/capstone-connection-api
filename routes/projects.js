@@ -8,7 +8,7 @@ const express = require('express');
 const { BadRequestError } = require('../expressError');
 const {
   ensureLoggedIn,
-  ensureCorrectUserOrAdminBody,
+  ensureCorrectUserOrAdminLikes,
 } = require('../middleware/auth');
 const imageUpload = require('../helpers/imageUpload');
 const Project = require('../models/project');
@@ -209,12 +209,11 @@ router.get('/:id', ensureLoggedIn, async function (req, res, next) {
 
 router.delete(
   '/:id/likes/:id',
-  ensureCorrectUserOrAdminBody,
+  ensureCorrectUserOrAdminLikes,
   async function (req, res, next) {
     try {
-      // const likerId = req.body.userId;
       console.log('REQ.BODY: ', req.body);
-      // const projectLike = await Project_Like.remove(req.params.id);
+      console.log('REQ.PARAMS: ', req.params);
       const { currentUsersLikeId } = req.body;
       const projectLike = await Project_Like.remove(currentUsersLikeId);
       return res.json({ deleted: currentUsersLikeId });

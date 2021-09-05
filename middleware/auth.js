@@ -79,6 +79,26 @@ function ensureCorrectUserOrAdminBody(req, res, next) {
   }
 }
 
+async function ensureCorrectUserOrAdminLikes(req, res, next) {
+  try {
+    const user = req.user;
+    // Get the id of the like to be deleted
+    const { currentUsersLikeId } = req.body;
+    // Get like object from Like model using currentUsersLikeId (i.e., the like id to be deleted)
+    const projectLike = await Project_Like.getOne(currentUsersLikeId);
+    console.log('projectLike FROM MIDDLEWARE: ', projectLike);
+    // pull off likerId
+    const { likerId } = projectLike;
+    // compare user.id to likerId
+    if (!(user && (user.isAdmin || user.id === likerId))) {
+      throw new UnauthorizedError();
+    }
+    return next();
+  } catch (err) {
+    return next(err);
+  }
+}
+
 /** Middleware to use when they must provide a valid token & either be the user matching username provided as route param OR the user is an admin.
  *
  *  If not, raises Unauthorized.
