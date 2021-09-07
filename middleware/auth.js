@@ -71,21 +71,9 @@ function ensureAdmin(req, res, next) {
 async function ensureCorrectUserOrAdminLikes(req, res, next) {
 	try {
 		const user = req.user;
-		// Get the id of the like to be deleted
 		const { currentUsersLikeId } = req.body;
-		console.log('USER: ', user, 'CURRENTUSERSLIKEID: ', currentUsersLikeId);
-		// Get like object from Like model using currentUsersLikeId (i.e., the like id to be deleted)
 		const projectLike = await Project_Like.getOne(currentUsersLikeId);
-		console.log('projectLike FROM MIDDLEWARE: ', projectLike);
-		// pull off likerId
 		const { likerId } = projectLike;
-		console.log(
-			'TYPEOF USER.ID: ',
-			typeof user.id,
-			'TYPEOF LIKERID: ',
-			typeof likerId,
-		);
-		// compare user.id to likerId
 		if (!(user && (user.isAdmin || user.id === likerId))) {
 			throw new UnauthorizedError();
 		}
@@ -101,17 +89,10 @@ async function ensureCorrectUserOrAdminLikes(req, res, next) {
  */
 async function ensureCorrectUserOrAdminComments(req, res, next) {
 	try {
-		// Get user from req.user
 		const user = req.user;
-		// Get the id of the comment to be modified
 		const commentId = req.params.id;
-
-		// Get comment object from Project_Comment model using commentId (i.e., the comment id to be updated)
 		const projectComment = await Project_Comment.getOne(commentId);
-		console.log('projectComment FROM MIDDLEWARE: ', projectComment);
-		// pull off commenterId
 		const { commenterId } = projectComment;
-		// compare user.id to commenterId
 		if (!(user && (user.isAdmin || user.id === commenterId))) {
 			throw new UnauthorizedError();
 		}
