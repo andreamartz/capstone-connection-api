@@ -1,41 +1,41 @@
-"use strict";
+'use strict';
 
 // const _ = require('lodash');
-const db = require("../db");
-const bcrypt = require("bcrypt");
-const { BCRYPT_WORK_FACTOR } = require("../config.js");
-const { sqlForPartialUpdate }  = require("../helpers/sql");
+const db = require('../db');
+const bcrypt = require('bcrypt');
+const { BCRYPT_WORK_FACTOR } = require('../config.js');
+const { sqlForPartialUpdate } = require('../helpers/sql');
 const {
   BadRequestError,
   UnauthorizedError,
   ForbiddenError,
   NotFoundError,
-} = require("../expressError");
+} = require('../expressError');
 
 /** Functions for users */
 
 class User {
-  /** Purpose: to authenticate a user 
-   * 
+  /** Purpose: to authenticate a user
+   *
    * Inputs: username, password
-   * 
-   * Returns: 
+   *
+   * Returns:
    *   {
-   *     user: 
+   *     user:
    *       {
    *         username,
    *         firstName,
-   *         lastName, 
-   *         bio, 
-   *         photoUrl, 
-   *         portfolioUrl, 
+   *         lastName,
+   *         bio,
+   *         photoUrl,
+   *         portfolioUrl,
    *         githubUrl,
    *         isAdmin
    *       }
    *   }
-   * 
+   *
    * Errors: Throws UnauthorizedError if user is not found or password is wrong
-  */
+   */
 
   static async authenticate(username, password) {
     // try to find the user first
@@ -70,61 +70,66 @@ class User {
     }
 
     // Error: user not found or password incorrect
-    throw new UnauthorizedError("Invalid username and/or password. Please try again.");
+    throw new UnauthorizedError(
+      'Invalid username and/or password. Please try again.'
+    );
   }
 
   /** Purpose: to register a user
    *
    * Inputs: { username, password, firstName, lastName, email, bio, photoUrl, portfolioUrl, gitHubUrl }
-   * 
-   * Returns: 
+   *
+   * Returns:
    *   {
-   *     user: 
-   *       { 
+   *     user:
+   *       {
    *         id,
    *         username,
    *         firstName,
-   *         lastName, 
+   *         lastName,
    *         email,
-   *         bio, 
-   *         photoUrl, 
-   *         portfolioUrl, 
+   *         bio,
+   *         photoUrl,
+   *         portfolioUrl,
    *         gitHubUrl,
    *         isAdmin
    *       }
    *   }
    *
    * Throws BadRequestError on duplicates.
-  **/
+   **/
 
   static async register({
-    username, 
-    password, 
-    firstName, 
-    lastName, 
-    email, 
-    bio, 
-    photoUrl, 
-    portfolioUrl, 
-    gitHubUrl, 
-    isAdmin }) {
+    username,
+    password,
+    firstName,
+    lastName,
+    email,
+    bio,
+    photoUrl,
+    portfolioUrl,
+    gitHubUrl,
+    isAdmin,
+  }) {
     // check if the username has been taken already
     const duplicateCheck = await db.query(
       `SELECT username
        FROM users
        WHERE username = $1`,
-       [username]
+      [username]
     );
 
     // throw error if duplicate found
     if (duplicateCheck.rows[0]) {
-      throw new BadRequestError(`The username '${username}' has been taken; please choose another.`);
+      throw new BadRequestError(
+        `The username '${username}' has been taken; please choose another.`
+      );
     }
     // const defaultImageUrl = "https://res.cloudinary.com/wahmof2/image/upload/v1628100605/capstone_connections/users_capstone_connections/default-user-icon.png";
 
     // no duplicate found; save user to database
     const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
-    
+
     const query = `
       INSERT INTO users
         (username,
@@ -150,49 +155,50 @@ class User {
         github_url AS "gitHubUrl",
         is_admin AS "isAdmin"
     `;
-    const result = await db.query(query,
-      [
-        username,
-        hashedPassword,
-        firstName,
-        lastName,
-        email,
-        bio,
-        photoUrl,
-        portfolioUrl,
-        gitHubUrl,
-        isAdmin
-      ],
-    );
-    
+    const result = await db.query(query, [
+      username,
+      hashedPassword,
+      firstName,
+      lastName,
+      email,
+      bio,
+      photoUrl,
+      portfolioUrl,
+      gitHubUrl,
+      isAdmin,
+    ]);
+
     const user = result.rows[0];
 
-    if (!user) throw new NotFoundError(`Could not register user. Please try again later.`)
+    if (!user)
+      throw new NotFoundError(
+        `Could not register user. Please try again later.`
+      );
 
     return user;
   }
 
-  /** Purpose: Get a specific user by username 
-   * 
+  /** Purpose: Get a specific user by user id
+   *
    * Inputs: none
-   * 
-   * Returns: 
+   *
+   * Returns:
    *   {
-   *     user: 
+   *     user:
    *       {
    *         username,
    *         firstName,
-   *         lastName, 
-   *         bio, 
-   *         photoUrl, 
-   *         portfolioUrl, 
+   *         lastName,
+   *         bio,
+   *         photoUrl,
+   *         portfolioUrl,
    *         gitHubUrl,
    *         isAdmin
    *       }
    *   }
-   * 
+   *
    * Errors: Throws UnauthorizedError if user is not found or password is wrong
-  */
+   */
 
   static async getOne(userId) {
     if (!userId) {
@@ -244,49 +250,90 @@ class User {
     const projects = [];
 
     for (let i = 0; i < userResults.rows.length; i++) {
-      const { projectId, name, creatorId, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified } = userResults.rows[i];
+      const {
+        projectId,
+        name,
+        creatorId,
+        image,
+        repoUrl,
+        siteUrl,
+        description,
+        feedbackRequest,
+        createdAt,
+        lastModified,
+      } = userResults.rows[i];
 
-      let project = { projectId, name, creatorId, image, repoUrl, siteUrl, description, feedbackRequest, createdAt, lastModified };
+      let project = {
+        projectId,
+        name,
+        creatorId,
+        image,
+        repoUrl,
+        siteUrl,
+        description,
+        feedbackRequest,
+        createdAt,
+        lastModified,
+      };
 
       projects.push(project);
     }
 
-    const { id, username, firstName, lastName, bio, photoUrl, portfolioUrl, gitHubUrl } = userResults.rows[0];
+    const {
+      id,
+      username,
+      firstName,
+      lastName,
+      bio,
+      photoUrl,
+      portfolioUrl,
+      gitHubUrl,
+    } = userResults.rows[0];
 
-    const user = { id, username, firstName, lastName, bio, photoUrl, portfolioUrl, gitHubUrl };
+    const user = {
+      id,
+      username,
+      firstName,
+      lastName,
+      bio,
+      photoUrl,
+      portfolioUrl,
+      gitHubUrl,
+    };
 
     user.projects = projects;
 
-    console.log("USER: ", user);
+    console.log('USER: ', user);
+
+    return user;
+  }
+
 
     return user;
   }
 
   /** Purpose: Update user data with `data`
-   * 
-   * Inputs: 
-   * 
-   * Returns: 
-   * 
+   *
+   * Inputs:
+   *
+   * Returns:
+   *
    * Errors: Throws UnauthorizedError if user is not found or password is wrong
-  */
+   */
 
   static async update(userId, data) {
     if (data.password) {
       data.password = await bcrypt.hash(data.password, BCRYPT_WORK_FACTOR);
     }
 
-    const { setCols, values } = sqlForPartialUpdate(
-      data,
-      {
-        firstName: "first_name",
-        lastName: "last_name",
-        portfolioUrl: "portfolio_url",
-        gitHubUrl: "github_url"
-      }
-    );
+    const { setCols, values } = sqlForPartialUpdate(data, {
+      firstName: 'first_name',
+      lastName: 'last_name',
+      portfolioUrl: 'portfolio_url',
+      gitHubUrl: 'github_url',
+    });
 
-    const userIdVarIdx = "$" + (values.length + 1);
+    const userIdVarIdx = '$' + (values.length + 1);
 
     const querySql = `
       UPDATE users
@@ -303,7 +350,7 @@ class User {
     `;
 
     const result = await db.query(querySql, [...values, userId]);
-    const user =  result.rows[0];
+    const user = result.rows[0];
 
     if (!user) throw new NotFoundError(`No user found with id ${userId}`);
 
@@ -311,29 +358,27 @@ class User {
     return user;
   }
 
-
-
-  /** Purpose: to remove a user 
-   * 
+  /** Purpose: to remove a user
+   *
    * Inputs: username
-   * 
-   * Returns: 
+   *
+   * Returns:
    *   {
-   *     user: 
+   *     user:
    *       {
    *         username,
    *         firstName,
-   *         lastName, 
-   *         bio, 
-   *         photoUrl, 
-   *         portfolioUrl, 
+   *         lastName,
+   *         bio,
+   *         photoUrl,
+   *         portfolioUrl,
    *         githubUrl,
    *         isAdmin
    *       }
    *   }
-   * 
+   *
    * Errors: Throws UnauthorizedError if user is not found or password is wrong
-  */
+   */
   static async remove(id) {
     const query = `
       DELETE
@@ -347,6 +392,5 @@ class User {
     if (!user) throw new NotFoundError(`No user with id ${id} was found.`);
   }
 }
-
 
 module.exports = User;
