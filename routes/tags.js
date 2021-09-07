@@ -27,13 +27,13 @@ const router = new express.Router();
  *
  */
 router.post('/', ensureAdmin, async function (req, res, next) {
-  console.debug('CREATE NEW TAG');
-  try {
-    const tag = await Tag.create(req.body);
-    return res.status(201).json({ tag });
-  } catch (error) {
-    return next(error);
-  }
+	console.debug('CREATE NEW TAG');
+	try {
+		const tag = await Tag.create(req.body);
+		return res.status(201).json({ tag });
+	} catch (error) {
+		return next(error);
+	}
 });
 
 /** GET /
@@ -50,12 +50,12 @@ router.post('/', ensureAdmin, async function (req, res, next) {
  */
 
 router.get('/', ensureLoggedIn, async function (req, res, next) {
-  try {
-    const tags = await Tag.getAll(req.query);
-    return res.json({ tags });
-  } catch (err) {
-    return next(err);
-  }
+	try {
+		const tags = await Tag.getAll(req.query);
+		return res.json({ tags });
+	} catch (err) {
+		return next(err);
+	}
 });
 
 module.exports = router;

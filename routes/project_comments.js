@@ -7,8 +7,8 @@ const express = require('express');
 
 const { BadRequestError } = require('../expressError');
 const {
-  ensureLoggedIn,
-  ensureCorrectUserOrAdminComments,
+	ensureLoggedIn,
+	ensureCorrectUserOrAdminComments,
 } = require('../middleware/auth');
 const Project_Comment = require('../models/project_comment');
 
@@ -35,19 +35,19 @@ const router = new express.Router();
  * Errors: 
  */
 router.post('/', ensureLoggedIn, async function (req, res, next) {
-  console.debug('CREATE NEW COMMENT');
-  try {
-    const validator = jsonschema.validate(req.body, projectCommentsNewSchema);
-    if (!validator.valid) {
-      const errors = validator.errors.map((error) => error.stack);
-      throw new BadRequestError(errors);
-    }
+	console.debug('CREATE NEW COMMENT');
+	try {
+		const validator = jsonschema.validate(req.body, projectCommentsNewSchema);
+		if (!validator.valid) {
+			const errors = validator.errors.map((error) => error.stack);
+			throw new BadRequestError(errors);
+		}
 
-    const comment = await Project_Comment.create(req.body);
-    return res.status(201).json({ comment });
-  } catch (err) {
-    return next(err);
-  }
+		const comment = await Project_Comment.create(req.body);
+		return res.status(201).json({ comment });
+	} catch (err) {
+		return next(err);
+	}
 });
 
 /** PATCH /[id]
@@ -65,25 +65,25 @@ router.post('/', ensureLoggedIn, async function (req, res, next) {
  * Errors:
  */
 router.patch(
-  '/:id',
-  ensureCorrectUserOrAdminComments,
-  async function (req, res, next) {
-    try {
-      const validator = jsonschema.validate(
-        req.body,
-        projectCommentsUpdateSchema
-      );
-      if (!validator.valid) {
-        const errors = validator.errors.map((error) => error.stack);
-        throw new BadRequestError(errors);
-      }
+	'/:id',
+	ensureCorrectUserOrAdminComments,
+	async function (req, res, next) {
+		try {
+			const validator = jsonschema.validate(
+				req.body,
+				projectCommentsUpdateSchema,
+			);
+			if (!validator.valid) {
+				const errors = validator.errors.map((error) => error.stack);
+				throw new BadRequestError(errors);
+			}
 
-      const comment = await Project_Comment.update(req.params.id, req.body);
-      return res.json({ comment });
-    } catch (error) {
-      return next(error);
-    }
-  }
+			const comment = await Project_Comment.update(req.params.id, req.body);
+			return res.json({ comment });
+		} catch (error) {
+			return next(error);
+		}
+	},
 );
 
 module.exports = router;

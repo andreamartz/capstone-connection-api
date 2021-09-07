@@ -1,17 +1,20 @@
-"use strict";
+'use strict';
 
 /** Routes for users */
 
-const jsonschema = require("jsonschema");
+const jsonschema = require('jsonschema');
 
 // const userNewSchema = require("../schemas/userNew.json");
-const userUpdateSchema = require("../schemas/userUpdate.json");
+const userUpdateSchema = require('../schemas/userUpdate.json');
 
-const express = require("express");
-const { ensureLoggedIn, ensureCorrectUserOrAdminParams } = require("../middleware/auth");
-const { BadRequestError } = require("../expressError");
-const User = require("../models/user");
-const Project = require("../models/project");
+const express = require('express');
+const {
+	ensureLoggedIn,
+	ensureCorrectUserOrAdminParams,
+} = require('../middleware/auth');
+const { BadRequestError } = require('../expressError');
+const User = require('../models/user');
+const Project = require('../models/project');
 // const { createToken } = require("../helpers/tokens");
 
 // Data validation schemas
@@ -29,43 +32,43 @@ const router = express.Router();
 // });
 
 /** GET /[id] */
-router.get("/:id", ensureLoggedIn, async function (req, res, next) {
-  try {
-    const user = await User.getOne(req.params.id);
-    console.log("INSIDE GET users/:id ", "USER: ", user);
-    return res.json({ user });
-  } catch (err) {
-    return next(err);
-  }
+router.get('/:id', ensureLoggedIn, async function (req, res, next) {
+	try {
+		const user = await User.getOne(req.params.id);
+		console.log('INSIDE GET users/:id ', 'USER: ', user);
+		return res.json({ user });
+	} catch (err) {
+		return next(err);
+	}
 });
 
 /** GET /[id]/projects */
-router.get("/:id/projects", ensureLoggedIn, async function (req, res, next) {
-  try {
-    const userId = req.params.id;
-    const currentUserId = req.user.id;
+router.get('/:id/projects', ensureLoggedIn, async function (req, res, next) {
+	try {
+		const userId = req.params.id;
+		const currentUserId = req.user.id;
 
-    const projects = await Project.getAll(currentUserId, { userId });
-    return res.json({ projects });
-  } catch (err) {
-    return next(err);
-  }
+		const projects = await Project.getAll(currentUserId, { userId });
+		return res.json({ projects });
+	} catch (err) {
+		return next(err);
+	}
 });
 
 /** PATCH /[id] */
-router.patch("/:id", async function (req, res, next) {
-  try {
-    const validator = jsonschema.validate(req.body, userUpdateSchema);
-    if (!validator.valid) {
-      const errors = validator.errors.map(error => error.stack);
-      throw new BadRequestError(errors);
-    }
+router.patch('/:id', async function (req, res, next) {
+	try {
+		const validator = jsonschema.validate(req.body, userUpdateSchema);
+		if (!validator.valid) {
+			const errors = validator.errors.map((error) => error.stack);
+			throw new BadRequestError(errors);
+		}
 
-    const user = await User.update(req.params.id, req.body);
-    return res.json({ user });
-  } catch (err) {
-    return next(err);
-  }
+		const user = await User.update(req.params.id, req.body);
+		return res.json({ user });
+	} catch (err) {
+		return next(err);
+	}
 });
 
 /** DELETE /[id] */
