@@ -1,40 +1,40 @@
-"use strict";
+'use strict';
 
 /** Routes for authentication */
 
-const jsonschema = require("jsonschema");
-const User = require("../models/user");
-const express = require("express");
+const jsonschema = require('jsonschema');
+const User = require('../models/user');
+const express = require('express');
 const router = new express.Router();
-const createToken = require("../helpers/tokens");
-const userAuthSchema = require("../schemas/userAuth.json");
-const userRegisterSchema = require("../schemas/userRegister.json");
-const { BadRequestError } = require("../expressError");
-const imageUpload = require("../helpers/imageUpload");
+const createToken = require('../helpers/tokens');
+const userAuthSchema = require('../schemas/userAuth.json');
+const userRegisterSchema = require('../schemas/userRegister.json');
+const { BadRequestError } = require('../expressError');
+const imageUpload = require('../helpers/imageUpload');
 
 /** POST /auth/token
- * 
+ *
  * Input: { username, password }
- * 
+ *
  * Returns: token
  *  - a JWT token which can be used to authenticate further requests
- * 
+ *
  * Authorization required: none
  */
 
-router.post("/token", async function(req, res, next) {
+router.post('/token', async function (req, res, next) {
   try {
     const validator = jsonschema.validate(req.body, userAuthSchema);
-    console.log("USER LOGIN VALIDATOR: ", validator);
+    console.log('USER LOGIN VALIDATOR: ', validator);
     if (!validator.valid) {
-      const errs = validator.errors.map(e => e.stack);
+      const errs = validator.errors.map((e) => e.stack);
       throw new BadRequestError(errs);
     }
-    
+
     const { username, password } = req.body;
-    console.log("USERNAME: ", username, "PASSWORD: ", password);
+    console.log('USERNAME: ', username, 'PASSWORD: ', password);
     const user = await User.authenticate(username, password);
-    console.log("After auth request");
+    console.log('After auth request');
     const token = createToken(user);
     return res.json({ token });
   } catch (err) {
@@ -43,8 +43,8 @@ router.post("/token", async function(req, res, next) {
 });
 
 /** POST /auth/register
- * 
- * req.body: { 
+ *
+ * req.body: {
  *   username,
  *   password,
  *   firstName,
@@ -56,15 +56,15 @@ router.post("/token", async function(req, res, next) {
  *   githubUrl,
  *   isAdmin
  * }
- * 
+ *
  * Returns: token
  *  - a JWT token which can be used to authenticate further requests
- * 
+ *
  * Authorization required: none
  */
 
-router.post("/register", async function (req, res, next) {
-  console.debug("REGISTER A USER");
+router.post('/register', async function (req, res, next) {
+  console.debug('REGISTER A USER');
   try {
     const fileStr = req.body.photoUrl;
     let photoUrl;
@@ -81,10 +81,10 @@ router.post("/register", async function (req, res, next) {
     // Validate the data
     const validator = jsonschema.validate(req.body, userRegisterSchema);
     if (!validator.valid) {
-      const errors = validator.errors.map(e => e.stack);
+      const errors = validator.errors.map((e) => e.stack);
       throw new BadRequestError(errors);
     }
-    
+
     const newUser = await User.register({ ...req.body, isAdmin: false });
     const token = createToken(newUser);
     return res.status(201).json({ token });
