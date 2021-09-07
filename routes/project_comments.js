@@ -64,14 +64,23 @@ router.post('/', ensureLoggedIn, async function (req, res, next) {
  *
  * Errors:
  */
-router.patch("/:id", ensureCorrectUserOrAdminBody, async function(req, res, next) {
-  try {
-    const validator = jsonschema.validate(req.body, projectCommentsUpdateSchema);
-    if (!validator.valid) {
-      const errors = validator.errors.map(error => error.stack);
-      throw new BadRequestError(errors);
-    }
+router.patch(
+  '/:id',
+  ensureCorrectUserOrAdminComments,
+  async function (req, res, next) {
+    try {
+      const validator = jsonschema.validate(
+        req.body,
+        projectCommentsUpdateSchema
+      );
+      if (!validator.valid) {
+        const errors = validator.errors.map((error) => error.stack);
+        throw new BadRequestError(errors);
+      }
 
+      const comment = await Project_Comment.update(req.params.id, req.body);
+      return res.json({ comment });
+    } catch (error) {
       return next(error);
     }
   }
