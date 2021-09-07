@@ -35,6 +35,37 @@ class Project_Comment {
 		return project_comment;
 	}
 
+	/** Purpose: get a comment
+	 *
+	 * Input: id
+	 *
+	 * Returns:
+	 *
+	 * Error(s): throws NotFoundError if comment not found
+	 */
+
+	static async getOne(id) {
+		const query = `
+      SELECT
+        id AS commentId,
+        commenter_id AS commenterId,
+        project_id AS projectId,
+        comment,
+        created_at AS createdAt,
+        last_modified AS lastModified
+      FROM project_comments
+      WHERE id = $1
+    `;
+
+		const result = await db.query(query, [id]);
+		console.log('RESULT.rows: ', result.rows);
+
+		const comment = result.rows[0];
+
+		if (!comment) throw new NotFoundError(`No comment found with id ${id}`);
+
+		return comment;
+	}
 
 	/** Purpose: update a comment
 	 *
