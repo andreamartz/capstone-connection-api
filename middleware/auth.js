@@ -18,16 +18,16 @@ const Project_Comment = require('../models/project_comment');
  */
 
 function authenticateJWT(req, res, next) {
-  try {
-    const authHeader = req.headers && req.headers.authorization;
-    if (authHeader) {
-      const token = authHeader.replace(/^[Bb]earer /, '').trim();
-      req.user = jwt.verify(token, SECRET_KEY);
-    }
-    return next();
-  } catch (err) {
-    return next();
-  }
+	try {
+		const authHeader = req.headers && req.headers.authorization;
+		if (authHeader) {
+			const token = authHeader.replace(/^[Bb]earer /, '').trim();
+			req.user = jwt.verify(token, SECRET_KEY);
+		}
+		return next();
+	} catch (err) {
+		return next();
+	}
 }
 
 /** Middleware to use when they must be logged in.
@@ -36,12 +36,12 @@ function authenticateJWT(req, res, next) {
  */
 
 function ensureLoggedIn(req, res, next) {
-  try {
-    if (!req.user) throw new UnauthorizedError();
-    return next();
-  } catch (err) {
-    return next(err);
-  }
+	try {
+		if (!req.user) throw new UnauthorizedError();
+		return next();
+	} catch (err) {
+		return next(err);
+	}
 }
 
 /** Middleware to use when user needs to be an admin.
@@ -50,17 +50,17 @@ function ensureLoggedIn(req, res, next) {
  */
 
 function ensureAdmin(req, res, next) {
-  try {
-    if (!req.user) {
-      throw new UnauthorizedError();
-    }
-    if (!req.user.isAdmin) {
-      throw new ForbiddenError();
-    }
-    return next();
-  } catch (err) {
-    return next(err);
-  }
+	try {
+		if (!req.user) {
+			throw new UnauthorizedError();
+		}
+		if (!req.user.isAdmin) {
+			throw new ForbiddenError();
+		}
+		return next();
+	} catch (err) {
+		return next(err);
+	}
 }
 
 /** Middleware to use when they must provide a valid token & be either the admin or a user matching the liker of the project.
@@ -69,30 +69,30 @@ function ensureAdmin(req, res, next) {
  */
 
 async function ensureCorrectUserOrAdminLikes(req, res, next) {
-  try {
-    const user = req.user;
-    // Get the id of the like to be deleted
-    const { currentUsersLikeId } = req.body;
-    console.log('USER: ', user, 'CURRENTUSERSLIKEID: ', currentUsersLikeId);
-    // Get like object from Like model using currentUsersLikeId (i.e., the like id to be deleted)
-    const projectLike = await Project_Like.getOne(currentUsersLikeId);
-    console.log('projectLike FROM MIDDLEWARE: ', projectLike);
-    // pull off likerId
-    const { likerId } = projectLike;
-    console.log(
-      'TYPEOF USER.ID: ',
-      typeof user.id,
-      'TYPEOF LIKERID: ',
-      typeof likerId
-    );
-    // compare user.id to likerId
-    if (!(user && (user.isAdmin || user.id === likerId))) {
-      throw new UnauthorizedError();
-    }
-    return next();
-  } catch (err) {
-    return next(err);
-  }
+	try {
+		const user = req.user;
+		// Get the id of the like to be deleted
+		const { currentUsersLikeId } = req.body;
+		console.log('USER: ', user, 'CURRENTUSERSLIKEID: ', currentUsersLikeId);
+		// Get like object from Like model using currentUsersLikeId (i.e., the like id to be deleted)
+		const projectLike = await Project_Like.getOne(currentUsersLikeId);
+		console.log('projectLike FROM MIDDLEWARE: ', projectLike);
+		// pull off likerId
+		const { likerId } = projectLike;
+		console.log(
+			'TYPEOF USER.ID: ',
+			typeof user.id,
+			'TYPEOF LIKERID: ',
+			typeof likerId,
+		);
+		// compare user.id to likerId
+		if (!(user && (user.isAdmin || user.id === likerId))) {
+			throw new UnauthorizedError();
+		}
+		return next();
+	} catch (err) {
+		return next(err);
+	}
 }
 
 /** Middleware to use when they must provide a valid token & be either the admin or a user matching the commenter.
@@ -100,25 +100,25 @@ async function ensureCorrectUserOrAdminLikes(req, res, next) {
  *  If not, raises Unauthorized.
  */
 async function ensureCorrectUserOrAdminComments(req, res, next) {
-  try {
-    // Get user from req.user
-    const user = req.user;
-    // Get the id of the comment to be modified
-    const commentId = req.params.id;
+	try {
+		// Get user from req.user
+		const user = req.user;
+		// Get the id of the comment to be modified
+		const commentId = req.params.id;
 
-    // Get comment object from Project_Comment model using commentId (i.e., the comment id to be updated)
-    const projectComment = await Project_Comment.getOne(commentId);
-    console.log('projectComment FROM MIDDLEWARE: ', projectComment);
-    // pull off commenterId
-    const { commenterId } = projectComment;
-    // compare user.id to commenterId
-    if (!(user && (user.isAdmin || user.id === commenterId))) {
-      throw new UnauthorizedError();
-    }
-    return next();
-  } catch (err) {
-    return next(err);
-  }
+		// Get comment object from Project_Comment model using commentId (i.e., the comment id to be updated)
+		const projectComment = await Project_Comment.getOne(commentId);
+		console.log('projectComment FROM MIDDLEWARE: ', projectComment);
+		// pull off commenterId
+		const { commenterId } = projectComment;
+		// compare user.id to commenterId
+		if (!(user && (user.isAdmin || user.id === commenterId))) {
+			throw new UnauthorizedError();
+		}
+		return next();
+	} catch (err) {
+		return next(err);
+	}
 }
 
 /** Middleware to use when they must provide a valid token & either be the user matching username provided as route param OR the user is an admin.
@@ -127,23 +127,23 @@ async function ensureCorrectUserOrAdminComments(req, res, next) {
  */
 
 function ensureCorrectUserOrAdminParams(req, res, next) {
-  try {
-    const user = req.user;
+	try {
+		const user = req.user;
 
-    if (!(user && (user.isAdmin || user.id === +req.params.id))) {
-      throw new UnauthorizedError();
-    }
-    return next();
-  } catch (err) {
-    return next(err);
-  }
+		if (!(user && (user.isAdmin || user.id === +req.params.id))) {
+			throw new UnauthorizedError();
+		}
+		return next();
+	} catch (err) {
+		return next(err);
+	}
 }
 
 module.exports = {
-  authenticateJWT,
-  ensureLoggedIn,
-  ensureAdmin,
-  ensureCorrectUserOrAdminLikes,
-  ensureCorrectUserOrAdminComments,
-  ensureCorrectUserOrAdminParams,
+	authenticateJWT,
+	ensureLoggedIn,
+	ensureAdmin,
+	ensureCorrectUserOrAdminLikes,
+	ensureCorrectUserOrAdminComments,
+	ensureCorrectUserOrAdminParams,
 };
