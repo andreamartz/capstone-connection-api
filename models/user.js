@@ -6,41 +6,41 @@ const bcrypt = require('bcrypt');
 const { BCRYPT_WORK_FACTOR } = require('../config.js');
 const { sqlForPartialUpdate } = require('../helpers/sql');
 const {
-  BadRequestError,
-  UnauthorizedError,
-  ForbiddenError,
-  NotFoundError,
+	BadRequestError,
+	UnauthorizedError,
+	ForbiddenError,
+	NotFoundError,
 } = require('../expressError');
 
 /** Functions for users */
 
 class User {
-  /** Purpose: to authenticate a user
-   *
-   * Inputs: username, password
-   *
-   * Returns:
-   *   {
-   *     user:
-   *       {
-   *         username,
-   *         firstName,
-   *         lastName,
-   *         bio,
-   *         photoUrl,
-   *         portfolioUrl,
-   *         githubUrl,
-   *         isAdmin
-   *       }
-   *   }
-   *
-   * Errors: Throws UnauthorizedError if user is not found or password is wrong
-   */
+	/** Purpose: to authenticate a user
+	 *
+	 * Inputs: username, password
+	 *
+	 * Returns:
+	 *   {
+	 *     user:
+	 *       {
+	 *         username,
+	 *         firstName,
+	 *         lastName,
+	 *         bio,
+	 *         photoUrl,
+	 *         portfolioUrl,
+	 *         githubUrl,
+	 *         isAdmin
+	 *       }
+	 *   }
+	 *
+	 * Errors: Throws UnauthorizedError if user is not found or password is wrong
+	 */
 
-  static async authenticate(username, password) {
-    // try to find the user first
-    const result = await db.query(
-      `SELECT id,
+	static async authenticate(username, password) {
+		// try to find the user first
+		const result = await db.query(
+			`SELECT id,
               username, 
               password,
               first_name AS "firstName",
@@ -53,84 +53,84 @@ class User {
               is_admin AS "isAdmin"
       FROM users
       WHERE username = $1`,
-      [username]
-    );
+			[username],
+		);
 
-    const user = result.rows[0];
+		const user = result.rows[0];
 
-    // if user found, compare hashed password to a new hash from password
-    if (user) {
-      // compare hashed password to a new hash from password
-      const isValid = await bcrypt.compare(password, user.password);
-      // if passwords match, return user (after removing password property)
-      if (isValid === true) {
-        delete user.password;
-        return user;
-      }
-    }
+		// if user found, compare hashed password to a new hash from password
+		if (user) {
+			// compare hashed password to a new hash from password
+			const isValid = await bcrypt.compare(password, user.password);
+			// if passwords match, return user (after removing password property)
+			if (isValid === true) {
+				delete user.password;
+				return user;
+			}
+		}
 
-    // Error: user not found or password incorrect
-    throw new UnauthorizedError(
-      'Invalid username and/or password. Please try again.'
-    );
-  }
+		// Error: user not found or password incorrect
+		throw new UnauthorizedError(
+			'Invalid username and/or password. Please try again.',
+		);
+	}
 
-  /** Purpose: to register a user
-   *
-   * Inputs: { username, password, firstName, lastName, email, bio, photoUrl, portfolioUrl, gitHubUrl }
-   *
-   * Returns:
-   *   {
-   *     user:
-   *       {
-   *         id,
-   *         username,
-   *         firstName,
-   *         lastName,
-   *         email,
-   *         bio,
-   *         photoUrl,
-   *         portfolioUrl,
-   *         gitHubUrl,
-   *         isAdmin
-   *       }
-   *   }
-   *
-   * Throws BadRequestError on duplicates.
-   **/
+	/** Purpose: to register a user
+	 *
+	 * Inputs: { username, password, firstName, lastName, email, bio, photoUrl, portfolioUrl, gitHubUrl }
+	 *
+	 * Returns:
+	 *   {
+	 *     user:
+	 *       {
+	 *         id,
+	 *         username,
+	 *         firstName,
+	 *         lastName,
+	 *         email,
+	 *         bio,
+	 *         photoUrl,
+	 *         portfolioUrl,
+	 *         gitHubUrl,
+	 *         isAdmin
+	 *       }
+	 *   }
+	 *
+	 * Throws BadRequestError on duplicates.
+	 **/
 
-  static async register({
-    username,
-    password,
-    firstName,
-    lastName,
-    email,
-    bio,
-    photoUrl,
-    portfolioUrl,
-    gitHubUrl,
-    isAdmin,
-  }) {
-    // check if the username has been taken already
-    const duplicateCheck = await db.query(
-      `SELECT username
+	static async register({
+		username,
+		password,
+		firstName,
+		lastName,
+		email,
+		bio,
+		photoUrl,
+		portfolioUrl,
+		gitHubUrl,
+		isAdmin,
+	}) {
+		// check if the username has been taken already
+		const duplicateCheck = await db.query(
+			`SELECT username
        FROM users
        WHERE username = $1`,
-      [username]
-    );
+			[username],
+		);
 
-    // throw error if duplicate found
-    if (duplicateCheck.rows[0]) {
-      throw new BadRequestError(
-        `The username '${username}' has been taken; please choose another.`
-      );
-    }
-    // const defaultImageUrl = "https://res.cloudinary.com/wahmof2/image/upload/v1628100605/capstone_connections/users_capstone_connections/default-user-icon.png";
+		// throw error if duplicate found
+		if (duplicateCheck.rows[0]) {
+			throw new BadRequestError(
+				`The username '${username}' has been taken; please choose another.`,
+			);
+		}
+		// const defaultImageUrl = "https://res.cloudinary.com/wahmof2/image/upload/v1628100605/capstone_connections/users_capstone_connections/default-user-icon.png";
 
-    // no duplicate found; save user to database
-    const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
+		// no duplicate found; save user to database
+		const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
 
-    const query = `
+		const query = `
       INSERT INTO users
         (username,
         password,
@@ -155,67 +155,67 @@ class User {
         github_url AS "gitHubUrl",
         is_admin AS "isAdmin"
     `;
-    const result = await db.query(query, [
-      username,
-      hashedPassword,
-      firstName,
-      lastName,
-      email,
-      bio,
-      photoUrl,
-      portfolioUrl,
-      gitHubUrl,
-      isAdmin,
-    ]);
+		const result = await db.query(query, [
+			username,
+			hashedPassword,
+			firstName,
+			lastName,
+			email,
+			bio,
+			photoUrl,
+			portfolioUrl,
+			gitHubUrl,
+			isAdmin,
+		]);
 
-    const user = result.rows[0];
+		const user = result.rows[0];
 
-    if (!user)
-      throw new NotFoundError(
-        `Could not register user. Please try again later.`
-      );
+		if (!user)
+			throw new NotFoundError(
+				`Could not register user. Please try again later.`,
+			);
 
-    return user;
-  }
+		return user;
+	}
 
-  /** Purpose: Get a specific user by user id
-   *
-   * Inputs: none
-   *
-   * Returns:
-   *   {
-   *     user:
-   *       {
-   *         username,
-   *         firstName,
-   *         lastName,
-   *         bio,
-   *         photoUrl,
-   *         portfolioUrl,
-   *         gitHubUrl,
-   *         isAdmin
-   *       }
-   *   }
-   *
-   * Errors: Throws UnauthorizedError if user is not found or password is wrong
-   */
+	/** Purpose: Get a specific user by user id
+	 *
+	 * Inputs: none
+	 *
+	 * Returns:
+	 *   {
+	 *     user:
+	 *       {
+	 *         username,
+	 *         firstName,
+	 *         lastName,
+	 *         bio,
+	 *         photoUrl,
+	 *         portfolioUrl,
+	 *         gitHubUrl,
+	 *         isAdmin
+	 *       }
+	 *   }
+	 *
+	 * Errors: Throws UnauthorizedError if user is not found or password is wrong
+	 */
 
-  static async getOne(userId) {
-    if (!userId) {
-      throw new BadRequestError('No user id was provided.');
-    }
+	static async getOne(userId) {
+		if (!userId) {
+			throw new BadRequestError('No user id was provided.');
+		}
 
-    // const queryUserId = `
-    //   SELECT
-    //     id,
-    //     username
-    //   FROM users
-    //   WHERE id = $1
-    // `;
+		// const queryUserId = `
+		//   SELECT
+		//     id,
+		//     username
+		//   FROM users
+		//   WHERE id = $1
+		// `;
 
-    // const userIdQueryRes = await db.query(queryUserId, [userId]);
+		// const userIdQueryRes = await db.query(queryUserId, [userId]);
 
-    const query = `
+		const query = `
       SELECT 
         u.id,
         u.username,
@@ -241,95 +241,95 @@ class User {
       WHERE u.id = $1    
     `;
 
-    const userResults = await db.query(query, [userId]);
+		const userResults = await db.query(query, [userId]);
 
-    if (userResults.rows.length === 0) {
-      throw new NotFoundError(`Could not find user with id: ${userId}.`);
-    }
+		if (userResults.rows.length === 0) {
+			throw new NotFoundError(`Could not find user with id: ${userId}.`);
+		}
 
-    const projects = [];
+		const projects = [];
 
-    for (let i = 0; i < userResults.rows.length; i++) {
-      const {
-        projectId,
-        name,
-        creatorId,
-        image,
-        repoUrl,
-        siteUrl,
-        description,
-        feedbackRequest,
-        createdAt,
-        lastModified,
-      } = userResults.rows[i];
+		for (let i = 0; i < userResults.rows.length; i++) {
+			const {
+				projectId,
+				name,
+				creatorId,
+				image,
+				repoUrl,
+				siteUrl,
+				description,
+				feedbackRequest,
+				createdAt,
+				lastModified,
+			} = userResults.rows[i];
 
-      let project = {
-        projectId,
-        name,
-        creatorId,
-        image,
-        repoUrl,
-        siteUrl,
-        description,
-        feedbackRequest,
-        createdAt,
-        lastModified,
-      };
+			let project = {
+				projectId,
+				name,
+				creatorId,
+				image,
+				repoUrl,
+				siteUrl,
+				description,
+				feedbackRequest,
+				createdAt,
+				lastModified,
+			};
 
-      projects.push(project);
-    }
+			projects.push(project);
+		}
 
-    const {
-      id,
-      username,
-      firstName,
-      lastName,
-      bio,
-      photoUrl,
-      portfolioUrl,
-      gitHubUrl,
-    } = userResults.rows[0];
+		const {
+			id,
+			username,
+			firstName,
+			lastName,
+			bio,
+			photoUrl,
+			portfolioUrl,
+			gitHubUrl,
+		} = userResults.rows[0];
 
-    const user = {
-      id,
-      username,
-      firstName,
-      lastName,
-      bio,
-      photoUrl,
-      portfolioUrl,
-      gitHubUrl,
-    };
+		const user = {
+			id,
+			username,
+			firstName,
+			lastName,
+			bio,
+			photoUrl,
+			portfolioUrl,
+			gitHubUrl,
+		};
 
-    user.projects = projects;
+		user.projects = projects;
 
-    console.log('USER: ', user);
+		console.log('USER: ', user);
 
-    return user;
-  }
+		return user;
+	}
 
-  /** Purpose: Get a specific user by username
-   *
-   * Inputs: username
-   *
-   * Returns:
-   *   {
-   *     user:
-   *       {
-   *         id,
-   *         username,
-   *       }
-   *   }
-   *
-   * Errors: Throws UnauthorizedError if user is not found or password is wrong
-   */
+	/** Purpose: Get a specific user by username
+	 *
+	 * Inputs: username
+	 *
+	 * Returns:
+	 *   {
+	 *     user:
+	 *       {
+	 *         id,
+	 *         username,
+	 *       }
+	 *   }
+	 *
+	 * Errors: Throws UnauthorizedError if user is not found or password is wrong
+	 */
 
-  static async getOneByUsername(username) {
-    if (!username) {
-      throw new BadRequestError('No username was provided.');
-    }
+	static async getOneByUsername(username) {
+		if (!username) {
+			throw new BadRequestError('No username was provided.');
+		}
 
-    const query = `
+		const query = `
       SELECT 
         id,
         username
@@ -337,48 +337,48 @@ class User {
       WHERE username = $1    
     `;
 
-    const userResults = await db.query(query, [username]);
+		const userResults = await db.query(query, [username]);
 
-    if (userResults.rows.length === 0) {
-      throw new NotFoundError(
-        `Could not find user with username: ${username}.`
-      );
-    }
+		if (userResults.rows.length === 0) {
+			throw new NotFoundError(
+				`Could not find user with username: ${username}.`,
+			);
+		}
 
-    const { id } = userResults.rows[0];
+		const { id } = userResults.rows[0];
 
-    const user = {
-      id,
-      username,
-    };
+		const user = {
+			id,
+			username,
+		};
 
-    return user;
-  }
+		return user;
+	}
 
-  /** Purpose: Update user data with `data`
-   *
-   * Inputs:
-   *
-   * Returns:
-   *
-   * Errors: Throws UnauthorizedError if user is not found or password is wrong
-   */
+	/** Purpose: Update user data with `data`
+	 *
+	 * Inputs:
+	 *
+	 * Returns:
+	 *
+	 * Errors: Throws UnauthorizedError if user is not found or password is wrong
+	 */
 
-  static async update(userId, data) {
-    if (data.password) {
-      data.password = await bcrypt.hash(data.password, BCRYPT_WORK_FACTOR);
-    }
+	static async update(userId, data) {
+		if (data.password) {
+			data.password = await bcrypt.hash(data.password, BCRYPT_WORK_FACTOR);
+		}
 
-    const { setCols, values } = sqlForPartialUpdate(data, {
-      firstName: 'first_name',
-      lastName: 'last_name',
-      portfolioUrl: 'portfolio_url',
-      gitHubUrl: 'github_url',
-    });
+		const { setCols, values } = sqlForPartialUpdate(data, {
+			firstName: 'first_name',
+			lastName: 'last_name',
+			portfolioUrl: 'portfolio_url',
+			gitHubUrl: 'github_url',
+		});
 
-    const userIdVarIdx = '$' + (values.length + 1);
+		const userIdVarIdx = '$' + (values.length + 1);
 
-    const querySql = `
+		const querySql = `
       UPDATE users
       SET ${setCols}
       WHERE id = ${userIdVarIdx}
@@ -392,48 +392,48 @@ class User {
         github_url AS "gitHubUrl"
     `;
 
-    const result = await db.query(querySql, [...values, userId]);
-    const user = result.rows[0];
+		const result = await db.query(querySql, [...values, userId]);
+		const user = result.rows[0];
 
-    if (!user) throw new NotFoundError(`No user found with id ${userId}`);
+		if (!user) throw new NotFoundError(`No user found with id ${userId}`);
 
-    // delete user.password;
-    return user;
-  }
+		// delete user.password;
+		return user;
+	}
 
-  /** Purpose: to remove a user
-   *
-   * Inputs: username
-   *
-   * Returns:
-   *   {
-   *     user:
-   *       {
-   *         username,
-   *         firstName,
-   *         lastName,
-   *         bio,
-   *         photoUrl,
-   *         portfolioUrl,
-   *         githubUrl,
-   *         isAdmin
-   *       }
-   *   }
-   *
-   * Errors: Throws UnauthorizedError if user is not found or password is wrong
-   */
-  static async remove(id) {
-    const query = `
+	/** Purpose: to remove a user
+	 *
+	 * Inputs: username
+	 *
+	 * Returns:
+	 *   {
+	 *     user:
+	 *       {
+	 *         username,
+	 *         firstName,
+	 *         lastName,
+	 *         bio,
+	 *         photoUrl,
+	 *         portfolioUrl,
+	 *         githubUrl,
+	 *         isAdmin
+	 *       }
+	 *   }
+	 *
+	 * Errors: Throws UnauthorizedError if user is not found or password is wrong
+	 */
+	static async remove(id) {
+		const query = `
       DELETE
       FROM users
       WHERE id = $1
       RETURNING id
     `;
-    const result = await db.query(query, [id]);
-    const user = result.rows[0];
+		const result = await db.query(query, [id]);
+		const user = result.rows[0];
 
-    if (!user) throw new NotFoundError(`No user with id ${id} was found.`);
-  }
+		if (!user) throw new NotFoundError(`No user with id ${id} was found.`);
+	}
 }
 
 module.exports = User;
