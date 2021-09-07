@@ -1,12 +1,11 @@
-"use strict";
+'use strict';
 
 // const { result } = require("lodash");
-const db = require("../db");
-const { NotFoundError } = require("../expressError");
-const { sqlForPartialUpdate }  = require("../helpers/sql");
+const db = require('../db');
+const { NotFoundError } = require('../expressError');
+const { sqlForPartialUpdate } = require('../helpers/sql');
 
 class Project_Comment {
-
   static async create(data) {
     let query = `
       INSERT INTO project_comments (
@@ -22,42 +21,40 @@ class Project_Comment {
         comment, 
         created_at AS "createdAt", 
         last_modified AS "lastModified"
-    `
-    
-    const result = await db.query(query, [
-      data.commenterId,
-      data.projectId,
-      data.comment
-    ]);
+    `;
 
-    const project_comment = result.rows[0];
-    console.log(project_comment);
+		const result = await db.query(query, [
+			data.commenterId,
+			data.projectId,
+			data.comment,
+		]);
 
-    return project_comment;
-  }
+		const project_comment = result.rows[0];
+		console.log(project_comment);
 
-  /** Purpose: update a comment 
-   * 
-   * Input: commentId,
-   *        data: { projectId, userId, comment }
-   * 
-   * Returns: { comment: {id, commentId, projectId, comment, createdAt, lastModified }}
-   * 
-   * Error(s): throws NotFoundError if comment not found
-   */
+		return project_comment;
+	}
 
-  static async update(commentId, data) {
-    const { setCols, values } = sqlForPartialUpdate(
-      data,
-      {
-        userId: "commenter_id",
-        projectId: "project_id"
-      }
-    );
 
-    const commentIdVarIdx = "$" + (values.length + 1);
+	/** Purpose: update a comment
+	 *
+	 * Input: commentId,
+	 *        data: { projectId, userId, comment }
+	 *
+	 * Returns: { comment: {id, commentId, projectId, comment, createdAt, lastModified }}
+	 *
+	 * Error(s): throws NotFoundError if comment not found
+	 */
 
-    const querySql = `
+	static async update(commentId, data) {
+		const { setCols, values } = sqlForPartialUpdate(data, {
+			userId: 'commenter_id',
+			projectId: 'project_id',
+		});
+
+		const commentIdVarIdx = '$' + (values.length + 1);
+
+		const querySql = `
       UPDATE project_comments
       SET ${setCols}
       WHERE id = ${commentIdVarIdx}
@@ -70,14 +67,14 @@ class Project_Comment {
         last_modified AS "lastModified"
     `;
 
-    const result = await db.query(querySql, [...values, commentId]);
-    const comment = result.rows[0];
+		const result = await db.query(querySql, [...values, commentId]);
+		const comment = result.rows[0];
 
-    if (!comment) throw new NotFoundError(`No comment found with id ${commentId}`);
-
-    return comment;
-  }
-
+		if (!comment) {
+			throw new NotFoundError(`No comment found with id ${commentId}`);
+		}
+		return comment;
+	}
 }
 
 module.exports = Project_Comment;
