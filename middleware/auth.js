@@ -5,6 +5,7 @@
 const jwt = require('jsonwebtoken');
 const { SECRET_KEY } = require('../config');
 const { UnauthorizedError, ForbiddenError } = require('../expressError');
+const Project = require('../models/project');
 const Project_Like = require('../models/project_like');
 const Project_Comment = require('../models/project_comment');
 
@@ -102,6 +103,26 @@ async function ensureCorrectUserOrAdminComments(req, res, next) {
 	}
 }
 
+/** Middleware to use when they must provide a valid token & be either the admin or the project creator.
+ *
+ *  If not, raises Unauthorized.
+ */
+async function ensureCorrectUserOrAdminProjects(req, res, next) {
+	try {
+		const user = req.user;
+		const projectId = req.params.id;
+		const { id } = req.body;
+		const project = await Project.getOne(user.id, id);
+		const { creator } = project;
+		if (!(user && (user.isAdmin || user.id === creator.id))) {
+			throw new UnauthorizedError();
+		}
+		return next();
+	} catch (err) {
+		return next(err);
+	}
+}
+
 /** Middleware to use when they must provide a valid token & either be the user matching username provided as route param OR the user is an admin.
  *
  *  If not, raises Unauthorized.
@@ -126,5 +147,6 @@ module.exports = {
 	ensureAdmin,
 	ensureCorrectUserOrAdminLikes,
 	ensureCorrectUserOrAdminComments,
+	ensureCorrectUserOrAdminProjects,
 	ensureCorrectUserOrAdminParams,
 };
