@@ -308,6 +308,49 @@ class User {
     return user;
   }
 
+  /** Purpose: Get a specific user by username
+   *
+   * Inputs: username
+   *
+   * Returns:
+   *   {
+   *     user:
+   *       {
+   *         id,
+   *         username,
+   *       }
+   *   }
+   *
+   * Errors: Throws UnauthorizedError if user is not found or password is wrong
+   */
+
+  static async getOneByUsername(username) {
+    if (!username) {
+      throw new BadRequestError('No username was provided.');
+    }
+
+    const query = `
+      SELECT 
+        id,
+        username
+      FROM users
+      WHERE username = $1    
+    `;
+
+    const userResults = await db.query(query, [username]);
+
+    if (userResults.rows.length === 0) {
+      throw new NotFoundError(
+        `Could not find user with username: ${username}.`
+      );
+    }
+
+    const { id } = userResults.rows[0];
+
+    const user = {
+      id,
+      username,
+    };
 
     return user;
   }
