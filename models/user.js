@@ -8,7 +8,6 @@ const { sqlForPartialUpdate } = require('../helpers/sql');
 const {
 	BadRequestError,
 	UnauthorizedError,
-	ForbiddenError,
 	NotFoundError,
 } = require('../expressError');
 

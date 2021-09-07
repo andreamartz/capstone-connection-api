@@ -3,13 +3,6 @@
 
 process.env.NODE_ENV = 'test'; // must come before loading db.js
 
-const {
-	BadRequestError,
-	UnauthorizedError,
-	ForbiddenError,
-	NotFoundError,
-} = require('../expressError');
-
 const request = require('supertest');
 const app = require('../app');
 const db = require('../db');

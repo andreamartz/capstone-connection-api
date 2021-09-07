@@ -1,12 +1,6 @@
 'use strict';
 
 const db = require('../db');
-const {
-	BadRequestError,
-	UnauthorizedError,
-	ForbiddenError,
-	NotFoundError,
-} = require('../expressError');
 
 /** Functions for tags */
 class Tag {

@@ -2,13 +2,7 @@
 
 const _ = require('lodash');
 const db = require('../db');
-const {
-	BadRequestError,
-	UnauthorizedError,
-	ForbiddenError,
-	NotFoundError,
-} = require('../expressError');
-const { sqlForPartialUpdate } = require('../helpers/sql');
+const { NotFoundError } = require('../expressError');
 const { projectsSqlToExpress } = require('../helpers/projectsSqlToExpress');
 
 /** Functions for projects */
@@ -282,8 +276,6 @@ class Project {
       ON pl.project_id = p.id
       WHERE p.id = $1
     `;
-
-		// (SELECT COUNT(*) FROM project_likes AS pl WHERE p.id = pl.project_id) AS "likesCount"
 
 		const projectRes = await db.query(prjQuery, [id]);
 		let projectRows = projectRes.rows;
