@@ -39,6 +39,61 @@ router.post('/token', async function (req, res, next) {
 	}
 });
 
+/** POST /auth/register/demo
+ *
+ * Req.body: none
+ *
+ * Returns: token
+ *  - a JWT token which can be used to authenticate further requests
+ *
+ * Authorization required: none
+ */
+
+router.get('/register/demo', async function (req, res, next) {
+	console.debug('REGISTER A DEMO USER');
+	try {
+		// Check for demo user in database
+		console.log('REQ.BODY: ', req.body);
+		const user = await User.getOneByUsername('demouser');
+		const { id } = user;
+
+		if (!user) {
+			return next(err);
+		}
+		// if found, delete the demo user
+		await User.remove(id);
+
+		// Create new demo user
+		const photoUrl =
+			'https://res.cloudinary.com/wahmof2/image/upload/v1628100605/capstone_connections/users_capstone_connections/default-user-icon.png';
+
+		const demoUserData = {
+			username: 'demouser',
+			password: 'demopassword',
+			firstName: 'Demo',
+			lastName: 'User',
+			email: 'demo@email.com',
+			bio: 'I am Demo User. This is my bio.',
+			photoUrl: photoUrl,
+			portfolioUrl: null,
+			githubUrl: null,
+			isAdmin: false,
+		};
+
+		const demoUser = await User.register(demoUserData);
+		const token = createToken(demoUser);
+		return res.status(201).json({ token });
+	} catch (err) {
+		if (err.code === '23505') {
+			console.error(err);
+			return next(
+				new BadRequestError('Username taken. Please choose another.'),
+			);
+		}
+		return next(err);
+	}
+});
+
 /** POST /auth/register
  *
  * req.body: {
@@ -84,61 +139,6 @@ router.post('/register', async function (req, res, next) {
 
 		const newUser = await User.register({ ...req.body, isAdmin: false });
 		const token = createToken(newUser);
-		return res.status(201).json({ token });
-	} catch (err) {
-		if (err.code === '23505') {
-			console.error(err);
-			return next(
-				new BadRequestError('Username taken. Please choose another.'),
-			);
-		}
-		return next(err);
-	}
-});
-
-/** POST /auth/register/demo
- *
- * Req.body: none
- *
- * Returns: token
- *  - a JWT token which can be used to authenticate further requests
- *
- * Authorization required: none
- */
-
-router.get('/register/demo', async function (req, res, next) {
-	console.debug('REGISTER A DEMO USER');
-	try {
-		// Check for demo user in database
-
-		const user = await User.getOneByUsername('demouser');
-		const { id, username } = user;
-
-		if (!user) {
-			return next(err);
-		}
-		// if found, delete the demo user
-		const deletedUser = await User.remove(id);
-
-		// Create new demo user
-		const photoUrl =
-			'https://res.cloudinary.com/wahmof2/image/upload/v1628100605/capstone_connections/users_capstone_connections/default-user-icon.png';
-
-		const demoUserData = {
-			username: 'demouser',
-			password: 'demopassword',
-			firstName: 'Demo',
-			lastName: 'User',
-			email: 'demo@email.com',
-			bio: 'I am Demo User. This is my bio.',
-			photoUrl: photoUrl,
-			portfolioUrl: null,
-			githubUrl: null,
-			isAdmin: false,
-		};
-
-		const demoUser = await User.register(demoUserData);
-		const token = createToken(demoUser);
 		return res.status(201).json({ token });
 	} catch (err) {
 		if (err.code === '23505') {
