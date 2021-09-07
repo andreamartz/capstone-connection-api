@@ -415,21 +415,6 @@ class Project {
 		return project;
 	}
 
-	/** Purpose: update a project with `data`
-	 *
-	 * Input:
-	 *
-	 * Returns:
-	 *   {
-	 *     project: {
-	 *     }
-	 *   }
-	 *
-	 *  Error(s):
-	 */
-
-	static async update(id, data) {}
-
 	/** Purpose: delete a project
 	 *
 	 * Input:
