@@ -1,12 +1,7 @@
 'use strict';
 
-/** Routes for users */
-
 const jsonschema = require('jsonschema');
-
-// const userNewSchema = require("../schemas/userNew.json");
 const userUpdateSchema = require('../schemas/userUpdate.json');
-
 const express = require('express');
 const {
 	ensureLoggedIn,
@@ -15,21 +10,9 @@ const {
 const { BadRequestError } = require('../expressError');
 const User = require('../models/user');
 const Project = require('../models/project');
-// const { createToken } = require("../helpers/tokens");
-
-// Data validation schemas
-
 const router = express.Router();
 
-/** GET / */
-// router.get("/", async function (req, res, next) {
-//   try {
-//     const users = await User.findAll();
-//     return res.json({ users });
-//   } catch (err) {
-//     return next(err);
-//   }
-// });
+/** Routes for users */
 
 /** GET /[id] */
 router.get('/:id', ensureLoggedIn, async function (req, res, next) {
@@ -56,29 +39,23 @@ router.get('/:id/projects', ensureLoggedIn, async function (req, res, next) {
 });
 
 /** PATCH /[id] */
-router.patch('/:id', async function (req, res, next) {
-	try {
-		const validator = jsonschema.validate(req.body, userUpdateSchema);
-		if (!validator.valid) {
-			const errors = validator.errors.map((error) => error.stack);
-			throw new BadRequestError(errors);
+router.patch(
+	'/:id',
+	ensureCorrectUserOrAdminParams,
+	async function (req, res, next) {
+		try {
+			const validator = jsonschema.validate(req.body, userUpdateSchema);
+			if (!validator.valid) {
+				const errors = validator.errors.map((error) => error.stack);
+				throw new BadRequestError(errors);
+			}
+
+			const user = await User.update(req.params.id, req.body);
+			return res.json({ user });
+		} catch (err) {
+			return next(err);
 		}
-
-		const user = await User.update(req.params.id, req.body);
-		return res.json({ user });
-	} catch (err) {
-		return next(err);
-	}
-});
-
-/** DELETE /[id] */
-// router.delete("/:id", ensureCorrectUserOrAdminParams, async function (req, res, next) {
-//   try {
-//     await User.remove(req.params.id);
-//     return res.json({ deleted: req.params.id });
-//   } catch (err) {
-//     return next(err);
-//   }
-// });
+	},
+);
 
 module.exports = router;
