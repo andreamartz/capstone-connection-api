@@ -6,8 +6,8 @@ const { NotFoundError } = require('../expressError');
 const { sqlForPartialUpdate } = require('../helpers/sql');
 
 class Project_Comment {
-  static async create(data) {
-    let query = `
+	static async create(data) {
+		let query = `
       INSERT INTO project_comments (
         commenter_id,
         project_id,
