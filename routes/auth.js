@@ -53,7 +53,6 @@ router.get('/register/demo', async function (req, res, next) {
 	console.debug('REGISTER A DEMO USER');
 	try {
 		// Check for demo user in database
-		console.log('REQ.BODY: ', req.body);
 		const user = await User.getOneByUsername('demouser');
 		const { id } = user;
 

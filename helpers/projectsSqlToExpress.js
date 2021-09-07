@@ -139,7 +139,6 @@ const projectsSqlToExpress = (results, currentUserId) => {
 			? likedByCurrentUser.likeId
 			: null;
 	}
-	console.log('PROJECTS FROM PROJECTSSQLTOEXPRESS: ', projects);
 	return projects;
 };
 
