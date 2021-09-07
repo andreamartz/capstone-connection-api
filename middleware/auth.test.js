@@ -1,30 +1,47 @@
-"use strict";
+'use strict';
 
-const jwt = require("jsonwebtoken");
-const { UnauthorizedError, ForbiddenError } = require("../expressError");
+const jwt = require('jsonwebtoken');
+const { UnauthorizedError, ForbiddenError } = require('../expressError');
 const {
   authenticateJWT,
   ensureLoggedIn,
   ensureAdmin,
   ensureCorrectUserOrAdminParams,
-  ensureCorrectUserOrAdminBody
-} = require("./auth");
+  ensureCorrectUserOrAdminComments,
+  ensureCorrectUserOrAdminLikes,
+} = require('./auth');
 
-const { SECRET_KEY } = require("../config");
-const testJwt = jwt.sign({ 
-  id: 1,
-  username: "test",
-  firstName: "First",
-  lastName: "Last",
-  isAdmin: false 
-}, SECRET_KEY);
-const badJwt = jwt.sign({
-  id: 1,
-  username: "test", 
-  firstName: "First",
-  lastName: "Last",
-  isAdmin: false 
-}, "not-secret-key");
+const { SECRET_KEY } = require('../config');
+const testJwt = jwt.sign(
+  {
+    id: 1,
+    username: 'test',
+    firstName: 'First',
+    lastName: 'Last',
+    isAdmin: false,
+  },
+  SECRET_KEY
+);
+const testAdminJwt = jwt.sign(
+  {
+    id: 1,
+    username: 'test',
+    firstName: 'First',
+    lastName: 'Last',
+    isAdmin: true,
+  },
+  SECRET_KEY
+);
+const badJwt = jwt.sign(
+  {
+    id: 1,
+    username: 'test',
+    firstName: 'First',
+    lastName: 'Last',
+    isAdmin: false,
+  },
+  'not-secret-key'
+);
 
 describe("authenticateJWT", function() {
   test("works when valid token passed via header", function() {
@@ -38,14 +55,14 @@ describe("authenticateJWT", function() {
     expect(req.user).toEqual({
       iat: expect.any(Number),
       id: 1,
-      username: "test",
-      firstName: "First",
-      lastName: "Last",
-      isAdmin: false
+      username: 'test',
+      firstName: 'First',
+      lastName: 'Last',
+      isAdmin: false,
     });
   });
 
-  test("works when no header", function() {
+  test('works when no header', function () {
     expect.assertions(2);
     const req = {};
     const res = {};
@@ -56,7 +73,7 @@ describe("authenticateJWT", function() {
     expect(req.user).toBeUndefined();
   });
 
-  test("works when invalid token passed in header", function() {
+  test('works when invalid token passed in header', function () {
     expect.assertions(2);
     const req = { headers: { authorization: `Bearer ${badJwt}` } };
     const res = {};
@@ -68,10 +85,10 @@ describe("authenticateJWT", function() {
   });
 });
 
-describe("ensureLoggedIn", function() {
-  test("works when user is logged in", function() {
+describe('ensureLoggedIn', function () {
+  test('works when user is logged in', function () {
     expect.assertions(1);
-    const req = { user: { username: "test", is_admin: false } };
+    const req = { user: { username: 'test', is_admin: false } };
     const res = {};
     const next = function (err) {
       expect(err).toBeFalsy();
@@ -79,7 +96,7 @@ describe("ensureLoggedIn", function() {
     ensureLoggedIn(req, res, next);
   });
 
-  test("throws Unauthorized error when user not logged in", function() {
+  test('throws Unauthorized error when user not logged in', function () {
     expect.assertions(1);
     const req = {};
     const res = {};
@@ -90,10 +107,10 @@ describe("ensureLoggedIn", function() {
   });
 });
 
-describe("ensureAdmin", function() {
-  test("it works when user is an admin", function() {
+describe('ensureAdmin', function () {
+  test('it works when user is an admin', function () {
     expect.assertions(1);
-    const req = { user: { username: "test", isAdmin: true } };
+    const req = { user: { username: 'test', isAdmin: true } };
     const res = {};
     const next = function (err) {
       expect(err).toBeFalsy();
@@ -101,9 +118,9 @@ describe("ensureAdmin", function() {
     ensureAdmin(req, res, next);
   });
 
-  test("it does not authorize when user is not an admin", function() {
+  test('it does not authorize when user is not an admin', function () {
     expect.assertions(1);
-    const req = { user: { username: "test", isAdmin: false } };
+    const req = { user: { username: 'test', isAdmin: false } };
     const res = {};
     const next = function (err) {
       expect(err instanceof ForbiddenError).toBeTruthy();
@@ -111,7 +128,7 @@ describe("ensureAdmin", function() {
     ensureAdmin(req, res, next);
   });
 
-  test("it does not authorize when user is anonymous", function() {
+  test('it does not authorize when user is anonymous', function () {
     expect.assertions(1);
     const req = {};
     const res = {};
@@ -122,12 +139,12 @@ describe("ensureAdmin", function() {
   });
 });
 
-describe("ensureCorrectUserOrAdminParams", function() {
-  test("it works when user is an admin", function() {
+describe('ensureCorrectUserOrAdminParams', function () {
+  test('it works when user is an admin', function () {
     expect.assertions(1);
-    const req = { 
-      user: { id: 1, username: "admin", isAdmin: true },
-      params: { id: "1" }
+    const req = {
+      user: { id: 1, username: 'admin', isAdmin: true },
+      params: { id: '1' },
     };
     const res = {};
     const next = function (err) {
@@ -136,11 +153,11 @@ describe("ensureCorrectUserOrAdminParams", function() {
     ensureCorrectUserOrAdminParams(req, res, next);
   });
 
-  test("it works when same user", function() {
+  test('it works when same user', function () {
     expect.assertions(1);
-    const req = { 
-      user: { id: 1, username: "test", isAdmin: false },
-      params: { id: "1" }
+    const req = {
+      user: { id: 1, username: 'test', isAdmin: false },
+      params: { id: '1' },
     };
     const res = {};
     const next = function (err) {
@@ -149,11 +166,11 @@ describe("ensureCorrectUserOrAdminParams", function() {
     ensureCorrectUserOrAdminParams(req, res, next);
   });
 
-  test("it works when users are mismatched", function() {
+  test('it works when users are mismatched', function () {
     expect.assertions(1);
-    const req = { 
-      user: { id: 1, username: "test", isAdmin: false },
-      params: { id: "999" }
+    const req = {
+      user: { id: 1, username: 'test', isAdmin: false },
+      params: { id: '999' },
     };
     const res = {};
     const next = function (err) {
@@ -162,9 +179,9 @@ describe("ensureCorrectUserOrAdminParams", function() {
     ensureCorrectUserOrAdminParams(req, res, next);
   });
 
-  test("it works if user is anonymous", function() {
+  test('it works if user is anonymous', function () {
     expect.assertions(1);
-    const req = { params: { id: "1" } };
+    const req = { params: { id: '1' } };
     const res = {};
     const next = function (err) {
       expect(err instanceof UnauthorizedError).toBeTruthy();
@@ -173,18 +190,20 @@ describe("ensureCorrectUserOrAdminParams", function() {
   });
 });
 
-describe("ensureCorrectUserOrAdminBody", function() {
-  test("it works when user is an admin", function() {
+describe('ensureCorrectUserOrAdminLikes', function () {
+  test('it works when user is an admin', function () {
+    const { id, username, isAdmin } = jwt.decode(u1Token);
+    const wrongUsersLikeId = 1;
     expect.assertions(1);
-    const req = { 
-      user: { id: 1, username: "admin", isAdmin: true },
-      body: { userId: "1" }
+    const req = {
+      user: { id, username, isAdmin },
+      body: { projectId: 1, currentUsersLikeId: wrongUsersLikeId },
     };
     const res = {};
     const next = function (err) {
       expect(err).toBeFalsy();
     };
-    ensureCorrectUserOrAdminBody(req, res, next);
+    ensureCorrectUserOrAdminLikes(req, res, next);
   });
 
   test("it works when same user", function() {
