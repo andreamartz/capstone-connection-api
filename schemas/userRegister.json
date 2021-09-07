@@ -1,130 +1,109 @@
 {
-  "$id": "http://example.com/example.json",
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "default": {},
-  "description": "The root schema comprises the entire JSON document.",
-  "examples": [
-      {
-          "username": "zYG36*ae739!6",
-          "password": "hrI!yHa654hgd&",
-          "firstName": "First",
-          "lastName": "Last",
-          "email": "email6532@email.com",
-          "bio": "jgksadl;ghfea;gheaw;ghra",
-          "photoUrl": "https://res.cloudinary.com/wahmof2/image/upload/v1627180003/capstone_connections/lv6k2r59n9c9xeshkvhs.png",
-          "portfolioUrl": "https://andreamartz.dev/",
-          "gitHubUrl": "https://github.com/andreamartz",
-          "isAdmin": "false"
-      }
-  ],
-  "required": [
-      "username",
-      "password",
-      "firstName",
-      "lastName"
-  ],
-  "title": "The root schema",
-  "type": "object",
-  "properties": {
-      "username": {
-          "$id": "#/properties/username",
-          "default": "",
-          "description": "An explanation about the purpose of this instance.",
-          "examples": [
-              "zYG36*ae739!6"
-          ],
-          "minLength": 8,
-          "title": "The username schema",
-          "type": "string"
-      },
-      "password": {
-          "$id": "#/properties/password",
-          "default": "",
-          "description": "An explanation about the purpose of this instance.",
-          "examples": [
-              "hrI!yHa654hgd&"
-          ],
-          "title": "The password schema",
-          "minLength": 8,
-          "type": "string"
-      },
-      "firstName": {
-          "$id": "#/properties/firstName",
-          "default": "",
-          "description": "An explanation about the purpose of this instance.",
-          "examples": [
-              "First"
-          ],
-          "minLength": 3,
-          "title": "The firstName schema",
-          "type": "string"
-      },
-      "lastName": {
-          "$id": "#/properties/lastName",
-          "default": "",
-          "description": "An explanation about the purpose of this instance.",
-          "examples": [
-              "Last"
-          ],
-          "minLength": 2,
-          "title": "The lastName schema",
-          "type": "string"
-      },
-      "email": {
-          "$id": "#/properties/email",
-          "default": "",
-          "description": "An explanation about the purpose of this instance.",
-          "examples": [
-              "email6532@email.com"
-          ],
-          "format": "email",
-          "title": "The email schema",
-          "type": ["string", "null"]
-      },
-      "bio": {
-          "$id": "#/properties/bio",
-          "type": ["string", "null"],
-          "title": "The bio schema",
-          "description": "An explanation about the purpose of this instance.",
-          "default": "",
-          "examples": [
-              "jgksadl;ghfea;gheaw;ghra"
-          ]
-      },
-      "photoUrl": {
-          "$id": "#/properties/photoUrl",
-          "type": ["string", "null"],
-          "title": "The photoUrl schema",
-          "description": "An explanation about the purpose of this instance.",
-          "default": "",
-          "examples": [
-              "https://res.cloudinary.com/wahmof2/image/upload/v1627180003/capstone_connections/lv6k2r59n9c9xeshkvhs.png"
-          ],
-          "format": "uri", 
-          "pattern": "^https?://"
-      },
-      "portfolioUrl": {
-          "$id": "#/properties/portfolioUrl",
-          "type": ["string", "null"],
-          "title": "The portfolioUrl schema",
-          "description": "An explanation about the purpose of this instance.",
-          "default": "",
-          "examples": [
-              "https://andreamartz.dev/"
-          ],
-          "pattern": "^$|^https?://"
-      },
-      "gitHubUrl": {
-          "$id": "#/properties/gitHubUrl",
-          "type": ["string", "null"],
-          "title": "The gitHubUrl schema",
-          "description": "An explanation about the purpose of this instance.",
-          "default": "",
-          "examples": [
-              "https://github.com/andreamartz"
-          ],
-          "pattern": "^$|^https?://"
-      }
-  },
-  "additionalProperties": false
+	"$id": "http://example.com/example.json",
+	"$schema": "http://json-schema.org/draft-07/schema",
+	"default": {},
+	"description": "The root schema comprises the entire JSON document.",
+	"examples": [
+		{
+			"username": "zYG36*ae739!6",
+			"password": "hrI!yHa654hgd&",
+			"firstName": "First",
+			"lastName": "Last",
+			"email": "email6532@email.com",
+			"bio": "jgksadl;ghfea;gheaw;ghra",
+			"photoUrl": "https://res.cloudinary.com/wahmof2/image/upload/v1627180003/capstone_connections/lv6k2r59n9c9xeshkvhs.png",
+			"portfolioUrl": "https://andreamartz.dev/",
+			"gitHubUrl": "https://github.com/andreamartz",
+			"isAdmin": "false"
+		}
+	],
+	"required": ["username", "password", "firstName", "lastName"],
+	"title": "The root schema",
+	"type": "object",
+	"properties": {
+		"username": {
+			"$id": "#/properties/username",
+			"default": "",
+			"description": "An explanation about the purpose of this instance.",
+			"examples": ["zYG36*ae739!6"],
+			"minLength": 8,
+			"title": "The username schema",
+			"type": "string"
+		},
+		"password": {
+			"$id": "#/properties/password",
+			"default": "",
+			"description": "An explanation about the purpose of this instance.",
+			"examples": ["hrI!yHa654hgd&"],
+			"title": "The password schema",
+			"minLength": 8,
+			"type": "string"
+		},
+		"firstName": {
+			"$id": "#/properties/firstName",
+			"default": "",
+			"description": "An explanation about the purpose of this instance.",
+			"examples": ["First"],
+			"minLength": 3,
+			"title": "The firstName schema",
+			"type": "string"
+		},
+		"lastName": {
+			"$id": "#/properties/lastName",
+			"default": "",
+			"description": "An explanation about the purpose of this instance.",
+			"examples": ["Last"],
+			"minLength": 2,
+			"title": "The lastName schema",
+			"type": "string"
+		},
+		"email": {
+			"$id": "#/properties/email",
+			"default": "",
+			"description": "An explanation about the purpose of this instance.",
+			"examples": ["email6532@email.com"],
+			"format": "email",
+			"title": "The email schema",
+			"type": ["string", "null"]
+		},
+		"bio": {
+			"$id": "#/properties/bio",
+			"type": ["string", "null"],
+			"title": "The bio schema",
+			"description": "An explanation about the purpose of this instance.",
+			"default": "",
+			"examples": ["jgksadl;ghfea;gheaw;ghra"]
+		},
+		"photoUrl": {
+			"$id": "#/properties/photoUrl",
+			"type": ["string", "null"],
+			"title": "The photoUrl schema",
+			"description": "An explanation about the purpose of this instance.",
+			"default": "",
+			"examples": [
+				"https://res.cloudinary.com/wahmof2/image/upload/v1627180003/capstone_connections/lv6k2r59n9c9xeshkvhs.png"
+			],
+			"format": "uri",
+			"pattern": "^https?://"
+		},
+		"portfolioUrl": {
+			"$id": "#/properties/portfolioUrl",
+			"type": ["string", "null"],
+			"title": "The portfolioUrl schema",
+			"description": "An explanation about the purpose of this instance.",
+			"default": "",
+			"examples": ["https://andreamartz.dev/"],
+			"pattern": "^$|^https?://"
+		},
+		"gitHubUrl": {
+			"$id": "#/properties/gitHubUrl",
+			"type": ["string", "null"],
+			"title": "The gitHubUrl schema",
+			"description": "An explanation about the purpose of this instance.",
+			"default": "",
+			"examples": ["https://github.com/andreamartz"],
+			"pattern": "^$|^https?://"
+		}
+	},
+	"additionalProperties": false
 }

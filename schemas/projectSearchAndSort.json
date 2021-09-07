@@ -1,49 +1,43 @@
 {
-  "$id": "http://example.com/example.json",
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "default": {},
-  "description": "The root schema comprises the entire JSON document.",
-  "examples": [
-      {
-          "userId": 1,
-          "tagText": "HTML",
-          "sortVariable": "newest"
-      }
-  ],
-  "required": [],
-  "title": "The root schema",
-  "type": "object",
-  "properties": {
-      "userId": {
-          "$id": "#/properties/userId",
-          "type": "integer",
-          "title": "The userId schema",
-          "description": "An explanation about the purpose of this instance.",
-          "default": 0,
-          "examples": [
-              1
-          ]
-      },
-      "tagText": {
-          "$id": "#/properties/tagName",
-          "type": "string",
-          "title": "The tagText schema",
-          "description": "An explanation about the purpose of this instance.",
-          "default": "",
-          "examples": [
-              "HTML"
-          ]
-      },
-      "sortVariable": {
-        "$id": "#/properties/sortVariable",
-        "type": "string",
-        "title": "The sortVariable schema",
-        "description": "An explanation about the purpose of this instance.",
-        "default": "",
-        "examples": [
-            "newest"
-        ]
-      }
-  },
-  "additionalProperties": false
+	"$id": "http://example.com/example.json",
+	"$schema": "http://json-schema.org/draft-07/schema",
+	"default": {},
+	"description": "The root schema comprises the entire JSON document.",
+	"examples": [
+		{
+			"userId": 1,
+			"tagText": "HTML",
+			"sortVariable": "newest"
+		}
+	],
+	"required": [],
+	"title": "The root schema",
+	"type": "object",
+	"properties": {
+		"userId": {
+			"$id": "#/properties/userId",
+			"type": "integer",
+			"title": "The userId schema",
+			"description": "An explanation about the purpose of this instance.",
+			"default": 0,
+			"examples": [1]
+		},
+		"tagText": {
+			"$id": "#/properties/tagName",
+			"type": "string",
+			"title": "The tagText schema",
+			"description": "An explanation about the purpose of this instance.",
+			"default": "",
+			"examples": ["HTML"]
+		},
+		"sortVariable": {
+			"$id": "#/properties/sortVariable",
+			"type": "string",
+			"title": "The sortVariable schema",
+			"description": "An explanation about the purpose of this instance.",
+			"default": "",
+			"examples": ["newest"]
+		}
+	},
+	"additionalProperties": false
 }

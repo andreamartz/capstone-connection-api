@@ -1,53 +1,43 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "http://example.com/example.json",
-  "type": "object",
-  "title": "The root schema",
-  "description": "The root schema comprises the entire JSON document.",
-  "default": {},
-  "examples": [
-      {
-          "projectId": 1,
-          "commenterId": 3,
-          "comment": "Wow! What a project!"
-      }
-  ],
-  "required": [
-      "projectId",
-      "commenterId",
-      "comment"
-  ],
-  "properties": {
-      "projectId": {
-          "$id": "#/properties/projectId",
-          "type": "integer",
-          "title": "The projectId schema",
-          "description": "An explanation about the purpose of this instance.",
-          "default": 0,
-          "examples": [
-              1
-          ]
-      },
-      "commenterId": {
-          "$id": "#/properties/commenterId",
-          "type": "integer",
-          "title": "The commenterId schema",
-          "description": "An explanation about the purpose of this instance.",
-          "default": 0,
-          "examples": [
-              3
-          ]
-      },
-      "comment": {
-          "$id": "#/properties/comment",
-          "type": "string",
-          "title": "The comment schema",
-          "description": "An explanation about the purpose of this instance.",
-          "default": "",
-          "examples": [
-              "Wow! What a project!"
-          ]
-      }
-  },
-  "additionalProperties": false
+	"$schema": "http://json-schema.org/draft-07/schema",
+	"$id": "http://example.com/example.json",
+	"type": "object",
+	"title": "The root schema",
+	"description": "The root schema comprises the entire JSON document.",
+	"default": {},
+	"examples": [
+		{
+			"projectId": 1,
+			"commenterId": 3,
+			"comment": "Wow! What a project!"
+		}
+	],
+	"required": ["projectId", "commenterId", "comment"],
+	"properties": {
+		"projectId": {
+			"$id": "#/properties/projectId",
+			"type": "integer",
+			"title": "The projectId schema",
+			"description": "An explanation about the purpose of this instance.",
+			"default": 0,
+			"examples": [1]
+		},
+		"commenterId": {
+			"$id": "#/properties/commenterId",
+			"type": "integer",
+			"title": "The commenterId schema",
+			"description": "An explanation about the purpose of this instance.",
+			"default": 0,
+			"examples": [3]
+		},
+		"comment": {
+			"$id": "#/properties/comment",
+			"type": "string",
+			"title": "The comment schema",
+			"description": "An explanation about the purpose of this instance.",
+			"default": "",
+			"examples": ["Wow! What a project!"]
+		}
+	},
+	"additionalProperties": false
 }
