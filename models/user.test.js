@@ -3,12 +3,7 @@
 // set NODE_ENV variable before loading db.js
 process.env.NODE_ENV = 'test';
 
-const {
-	BadRequestError,
-	UnauthorizedError,
-	ForbiddenError,
-	NotFoundError,
-} = require('../expressError');
+const { UnauthorizedError } = require('../expressError');
 
 const db = require('../db');
 
