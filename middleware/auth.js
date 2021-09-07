@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const { SECRET_KEY } = require('../config');
 const { UnauthorizedError, ForbiddenError } = require('../expressError');
 const Project_Like = require('../models/project_like');
+const Project_Comment = require('../models/project_comment');
 
 /** Middleware: Authenticate user.
  *
@@ -62,15 +63,30 @@ function ensureAdmin(req, res, next) {
   }
 }
 
-/** Middleware to use when they must provide a valid token & be user matching username provided on the request body.
+/** Middleware to use when they must provide a valid token & be either the admin or a user matching the liker of the project.
  *
  *  If not, raises Unauthorized.
  */
 
-function ensureCorrectUserOrAdminBody(req, res, next) {
+async function ensureCorrectUserOrAdminLikes(req, res, next) {
   try {
     const user = req.user;
-    if (!(user && (user.isAdmin || user.id === +req.body.userId))) {
+    // Get the id of the like to be deleted
+    const { currentUsersLikeId } = req.body;
+    console.log('USER: ', user, 'CURRENTUSERSLIKEID: ', currentUsersLikeId);
+    // Get like object from Like model using currentUsersLikeId (i.e., the like id to be deleted)
+    const projectLike = await Project_Like.getOne(currentUsersLikeId);
+    console.log('projectLike FROM MIDDLEWARE: ', projectLike);
+    // pull off likerId
+    const { likerId } = projectLike;
+    console.log(
+      'TYPEOF USER.ID: ',
+      typeof user.id,
+      'TYPEOF LIKERID: ',
+      typeof likerId
+    );
+    // compare user.id to likerId
+    if (!(user && (user.isAdmin || user.id === likerId))) {
       throw new UnauthorizedError();
     }
     return next();
@@ -79,18 +95,24 @@ function ensureCorrectUserOrAdminBody(req, res, next) {
   }
 }
 
-async function ensureCorrectUserOrAdminLikes(req, res, next) {
+/** Middleware to use when they must provide a valid token & be either the admin or a user matching the commenter.
+ *
+ *  If not, raises Unauthorized.
+ */
+async function ensureCorrectUserOrAdminComments(req, res, next) {
   try {
+    // Get user from req.user
     const user = req.user;
-    // Get the id of the like to be deleted
-    const { currentUsersLikeId } = req.body;
-    // Get like object from Like model using currentUsersLikeId (i.e., the like id to be deleted)
-    const projectLike = await Project_Like.getOne(currentUsersLikeId);
-    console.log('projectLike FROM MIDDLEWARE: ', projectLike);
-    // pull off likerId
-    const { likerId } = projectLike;
-    // compare user.id to likerId
-    if (!(user && (user.isAdmin || user.id === likerId))) {
+    // Get the id of the comment to be modified
+    const commentId = req.params.id;
+
+    // Get comment object from Project_Comment model using commentId (i.e., the comment id to be updated)
+    const projectComment = await Project_Comment.getOne(commentId);
+    console.log('projectComment FROM MIDDLEWARE: ', projectComment);
+    // pull off commenterId
+    const { commenterId } = projectComment;
+    // compare user.id to commenterId
+    if (!(user && (user.isAdmin || user.id === commenterId))) {
       throw new UnauthorizedError();
     }
     return next();
@@ -121,6 +143,7 @@ module.exports = {
   authenticateJWT,
   ensureLoggedIn,
   ensureAdmin,
-  ensureCorrectUserOrAdminBody,
+  ensureCorrectUserOrAdminLikes,
+  ensureCorrectUserOrAdminComments,
   ensureCorrectUserOrAdminParams,
 };
