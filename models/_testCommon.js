@@ -1,17 +1,17 @@
-"use strict"
+'use strict';
 
-process.env.NODE_ENV = "test" // must come before import of db.js
+process.env.NODE_ENV = 'test'; // must come before import of db.js
 
-const bcrypt = require("bcrypt");
-const { BCRYPT_WORK_FACTOR } = require("../config");
-const db = require("../db.js");
-const User = require("../models/user");
-const Project = require("../models/project");
-const Tag = require("../models/tag");
-const Project_Comment = require("../models/project_comment");
-const Project_Like = require("../models/project_like");
-const Project_Tag = require("../models/project_tag");
-const { createToken } = require("../helpers/tokens");
+const bcrypt = require('bcrypt');
+const { BCRYPT_WORK_FACTOR } = require('../config');
+const db = require('../db.js');
+const User = require('../models/user');
+const Project = require('../models/project');
+const Tag = require('../models/tag');
+const Project_Comment = require('../models/project_comment');
+const Project_Like = require('../models/project_like');
+const Project_Tag = require('../models/project_tag');
+const { createToken } = require('../helpers/tokens');
 
 async function commonBeforeAll() {
   // try {
@@ -19,10 +19,10 @@ async function commonBeforeAll() {
   // } catch (err) {
   //   console.error(err);
   // }
-  
-  const hashedPw1 = await bcrypt.hash("pw1", BCRYPT_WORK_FACTOR);
-  const hashedPw2 = await bcrypt.hash("pw2", BCRYPT_WORK_FACTOR);
-  
+
+  const hashedPw1 = await bcrypt.hash('pw1', BCRYPT_WORK_FACTOR);
+  const hashedPw2 = await bcrypt.hash('pw2', BCRYPT_WORK_FACTOR);
+
   await db.query("SELECT setval(pg_get_serial_sequence('projects', 'id'), 1, false) FROM projects");
   await db.query("DELETE FROM projects");
 
@@ -42,7 +42,8 @@ async function commonBeforeAll() {
   await db.query("DELETE FROM project_comments");
 
   // create test users
-  await db.query(`
+  await db.query(
+    `
     INSERT INTO users(username, password, first_name, last_name, email, bio, photo_url, portfolio_url, github_url, is_admin)
     VALUES
       ('username1',
@@ -65,10 +66,7 @@ async function commonBeforeAll() {
       'https://via.placeholder.com/150x150?text=user2+portfolio',
       'https://via.placeholder.com/150x150?text=user2+github',
       TRUE)`,
-    [
-      hashedPw1,
-      hashedPw2
-    ]
+    [hashedPw1, hashedPw2]
   );
 
   // create test tags
@@ -78,8 +76,7 @@ async function commonBeforeAll() {
            ('CSS'),
            ('JS'),
            ('API')
-    RETURNING id, text`
-  );
+    RETURNING id, text`);
 
   // create test project 1
   const project1 = await db.query(`
@@ -99,17 +96,19 @@ async function commonBeforeAll() {
       'https://via.placeholder.com/300x300?text=p1+repo+url',
       'https://via.placeholder.com/300x300?text=p1+site+url',
       'p1 desc',
-      'p1 f_req')`
-  );
+      'p1 f_req')`);
 
   // user 2 likes project 1
-  const projectLike1 = await db.query(`
+  const projectLike1 = await db.query(
+    `
     INSERT INTO project_likes(
       liker_id,
       project_id
     )
-    VALUES ($1, $2)`,
-    [ 2, 1 ]
+    VALUES ($1, $2)
+    RETURNING id, liker_id AS "likerId",
+        project_id AS "projectId"`,
+    [2, 1]
   );
 
   const p1Like = projectLike1.rows[0];
@@ -132,35 +131,32 @@ async function commonBeforeAll() {
     'https://via.placeholder.com/300x300?text=p2+repo+url',
     'https://via.placeholder.com/300x300?text=p2+site+url',
     'p2 desc',
-    'p2 f_req')`
-);
+    'p2 f_req')`);
 
+  const p1 = project1.rows.filter((p) => p.id === 1);
+  const p1Tags = await Project_Tag.create(1, [3, 4]);
+  p1.tags = p1Tags;
 
-  const p1 = project1.rows.filter(p => p.id === 1);
-  const p1Tags = await Project_Tag.create(1, [ 3, 4 ]);
-  p1.tags=p1Tags;
-
-  const p2 = project2.rows.filter(p => p.id === 2);
-  const p2Tags = await Project_Tag.create(2, [ 1, 2, 4 ]);
-  p2.tags=p2Tags;
+  const p2 = project2.rows.filter((p) => p.id === 2);
+  const p2Tags = await Project_Tag.create(2, [1, 2, 4]);
+  p2.tags = p2Tags;
 }
 
 async function commonBeforeEach() {
-  await db.query("BEGIN");
+  await db.query('BEGIN');
 }
 
 async function commonAfterEach() {
-  await db.query("ROLLBACK");
+  await db.query('ROLLBACK');
 }
 
 async function commonAfterAll() {
   await db.end();
 }
 
-
 module.exports = {
   commonBeforeAll,
   commonBeforeEach,
   commonAfterEach,
-  commonAfterAll
+  commonAfterAll,
 };
