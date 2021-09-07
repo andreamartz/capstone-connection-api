@@ -135,7 +135,6 @@ async function commonBeforeAll() {
 	);
 
 	const p1Like = projectLike1.rows[0];
-	console.log('PROJECTLIKE1', projectLike1, 'P1LIKE: ', p1Like);
 
 	// create test project 2 separately so it will hopefully have a different creation timestamp
 	const project2 = await db.query(`

@@ -55,7 +55,6 @@ class Tag {
     `;
 		const tagsRes = await db.query(query);
 		const tags = tagsRes.rows;
-		console.log('tags: ', tags);
 
 		return tags;
 	}

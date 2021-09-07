@@ -7,18 +7,16 @@ const { cloudinary } = require('../utils/cloudinary');
 /** Upload image file to Cloudinary */
 const imageUpload = async (fileStr) => {
 	try {
-		// console.log("IN IMAGEUPLOAD", fileStr.substr(0, 40));
 		const uploadResponse = await cloudinary.uploader
 			.upload(fileStr, {
 				upload_preset: 'capstone_connections',
 			})
 			.catch((err) => {
-				console.log('UPLOAD ERROR:', err);
+				console.error('UPLOAD ERROR:', err);
 			});
-		// console.log("UPLOADRESPONSE: ", uploadResponse);
 		return uploadResponse;
 	} catch (error) {
-		console.log('TRY/CATCH ERROR: ', error);
+		console.error('ERROR in imageUpload: ', error);
 	}
 };
 

@@ -74,7 +74,6 @@ class Project {
 		);
 
 		const project = result.rows[0];
-		// console.log("PROJECT: ", project);
 
 		return project;
 	}
@@ -287,7 +286,6 @@ class Project {
 		// (SELECT COUNT(*) FROM project_likes AS pl WHERE p.id = pl.project_id) AS "likesCount"
 
 		const projectRes = await db.query(prjQuery, [id]);
-		console.log('PROJECTRES.ROWS[0]: ', projectRes.rows[0]);
 		let projectRows = projectRes.rows;
 		// Verify project exists before continuing (& throw error if not)
 		if (!projectRows[0]) throw new NotFoundError(`No project ${id} was found.`);
@@ -357,8 +355,6 @@ class Project {
 			},
 		);
 
-		// console.log("PROJECT: ", project);
-
 		project.likesCount = project.likes.length;
 
 		const likedByCurrentUser = project.likes.find(
@@ -423,8 +419,6 @@ class Project {
 		}));
 
 		project.comments = comments;
-
-		// console.log("PROJECT: ", project);
 
 		return project;
 	}

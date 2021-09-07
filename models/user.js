@@ -303,8 +303,6 @@ class User {
 
 		user.projects = projects;
 
-		console.log('USER: ', user);
-
 		return user;
 	}
 

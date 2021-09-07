@@ -25,16 +25,13 @@ const imageUpload = require('../helpers/imageUpload');
 router.post('/token', async function (req, res, next) {
 	try {
 		const validator = jsonschema.validate(req.body, userAuthSchema);
-		console.log('USER LOGIN VALIDATOR: ', validator);
 		if (!validator.valid) {
 			const errs = validator.errors.map((e) => e.stack);
 			throw new BadRequestError(errs);
 		}
 
 		const { username, password } = req.body;
-		console.log('USERNAME: ', username, 'PASSWORD: ', password);
 		const user = await User.authenticate(username, password);
-		console.log('After auth request');
 		const token = createToken(user);
 		return res.json({ token });
 	} catch (err) {
@@ -116,7 +113,6 @@ router.get('/register/demo', async function (req, res, next) {
 
 		const user = await User.getOneByUsername('demouser');
 		const { id, username } = user;
-		console.log('USER FROM /REGISTER/DEMO: ', user);
 
 		if (!user) {
 			return next(err);

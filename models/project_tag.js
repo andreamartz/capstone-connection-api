@@ -30,7 +30,6 @@ class Project_Tag {
 	static async create(projectId, tags) {
 		const results = await Promise.all(
 			tags.map(async (tag) => {
-				console.log('TAGS CREATOR, project ID: ', projectId, 'tag: ', tag);
 				const result = await db.query(
 					`INSERT INTO projects_tags (
           project_id,
@@ -42,12 +41,9 @@ class Project_Tag {
 					[projectId, tag],
 				);
 				const project_tag = result.rows[0];
-				console.log('PROJECT_TAG: ', project_tag);
 				return project_tag;
 			}),
 		);
-
-		console.log('CREATE TAGS: ', results);
 
 		return results;
 	}

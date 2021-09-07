@@ -30,7 +30,6 @@ class Project_Comment {
 		]);
 
 		const project_comment = result.rows[0];
-		console.log(project_comment);
 
 		return project_comment;
 	}
@@ -58,7 +57,6 @@ class Project_Comment {
     `;
 
 		const result = await db.query(query, [id]);
-		console.log('RESULT.rows: ', result.rows);
 
 		const comment = result.rows[0];
 

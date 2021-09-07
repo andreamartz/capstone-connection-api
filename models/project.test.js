@@ -74,7 +74,6 @@ describe('getAll', function () {
 			sortVariable: 'most likes',
 		};
 		const projects = await Project.getAll(1, filterParams);
-		console.log('PROJECTS: ', projects);
 		expect(projects).toHaveLength(2);
 		expect(projects[0].id).toBe(1);
 		expect(projects[0].likesCount).toBeGreaterThan(projects[1].likesCount);

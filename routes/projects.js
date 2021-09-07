@@ -58,7 +58,6 @@ router.post('/', ensureLoggedIn, async function (req, res, next) {
 		}
 
 		const project = await Project.create(req.body);
-		console.log('PROJECT BEFORE ADDING TAGS: ', project);
 
 		const prjTags = await Project_Tag.create(project.id, req.body.tags);
 		project.tags = prjTags;
@@ -83,8 +82,6 @@ router.post('/', ensureLoggedIn, async function (req, res, next) {
  */
 router.post('/:id/likes', ensureLoggedIn, async function (req, res, next) {
 	try {
-		console.log('BACKEND REQ.AUTHORIZATION: ', req.authorization);
-
 		const projectLike = await Project_Like.create(req.body);
 
 		return res.status(201).json({ projectLike });
@@ -118,7 +115,6 @@ router.post('/:id/likes', ensureLoggedIn, async function (req, res, next) {
 
 router.post('/:id/tags', ensureLoggedIn, async function (req, res, next) {
 	try {
-		console.log('BACKEND REQ.BODY: ', req.body, 'REQ.USER: ', req.user);
 		const projectId = req.params.id;
 		const { tags } = req.body;
 
@@ -149,7 +145,6 @@ router.post('/:id/tags', ensureLoggedIn, async function (req, res, next) {
 
 router.get('/', ensureLoggedIn, async function (req, res, next) {
 	const currentUserId = req.user.id;
-	console.log('REQ.QUERY for getting projects: ', req.query);
 	const { tagText, sortVariable } = req.query;
 	try {
 		if (tagText || sortVariable) {
@@ -212,8 +207,6 @@ router.delete(
 	ensureCorrectUserOrAdminLikes,
 	async function (req, res, next) {
 		try {
-			console.log('REQ.BODY: ', req.body);
-			console.log('REQ.PARAMS: ', req.params);
 			const { currentUsersLikeId } = req.body;
 			const projectLike = await Project_Like.remove(currentUsersLikeId);
 			return res.json({ deleted: currentUsersLikeId });

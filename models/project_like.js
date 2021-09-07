@@ -37,7 +37,6 @@ class Project_Like {
 		const likeRes = await db.query(query, [data.likerId, data.projectId]);
 
 		const like = likeRes.rows[0];
-		console.log('LIKE: ', like);
 
 		return like;
 	}
@@ -63,13 +62,6 @@ class Project_Like {
     `;
 
 		const result = await db.query(query, [id]);
-		console.log('RESULT.rows FROM PROJECT_LIKE MODEL: ', result.rows);
-		console.log(
-			'LIKERID: ',
-			result.rows[0].likerId,
-			'TYPEOF RESULT.ROWS[0].LIKERID: ',
-			typeof result.rows[0].likerId,
-		);
 		const like = result.rows[0];
 
 		if (!like) throw new NotFoundError(`No like found with id ${id}`);
