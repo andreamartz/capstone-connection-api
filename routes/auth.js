@@ -91,7 +91,9 @@ router.post('/register', async function (req, res, next) {
   } catch (err) {
     if (err.code === '23505') {
       console.error(err);
-      return next(new BadRequestError("Username taken. Please choose another."));
+      return next(
+        new BadRequestError('Username taken. Please choose another.')
+      );
     }
     return next(err);
   }
