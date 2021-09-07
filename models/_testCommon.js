@@ -23,23 +23,46 @@ async function commonBeforeAll() {
   const hashedPw1 = await bcrypt.hash('pw1', BCRYPT_WORK_FACTOR);
   const hashedPw2 = await bcrypt.hash('pw2', BCRYPT_WORK_FACTOR);
 
-  await db.query("SELECT setval(pg_get_serial_sequence('projects', 'id'), 1, false) FROM projects");
-  await db.query("DELETE FROM projects");
+  /**
+   * reset database id sequence on projects and delete projects
+   * this must come before doing the same for users;
+   */
+  await db.query(
+    "SELECT setval(pg_get_serial_sequence('projects', 'id'), 1, false) FROM projects"
+  );
+  await db.query('DELETE FROM projects');
 
-  await db.query("SELECT setval(pg_get_serial_sequence('users', 'id'), 1, false) FROM users");
-  await db.query("DELETE FROM users");
+  // reset database id sequence on users and delete users
 
-  await db.query("SELECT setval(pg_get_serial_sequence('projects_tags', 'id'), 1, false) FROM projects_tags");
-  await db.query("DELETE FROM projects_tags");
+  await db.query(
+    "SELECT setval(pg_get_serial_sequence('users', 'id'), 1, false) FROM users"
+  );
+  await db.query('DELETE FROM users');
 
-  await db.query("SELECT setval(pg_get_serial_sequence('tags', 'id'), 1, false) FROM tags");
-  await db.query("DELETE FROM tags");
+  // reset database id sequence on projects_tags join table and delete projects_tags
+  await db.query(
+    "SELECT setval(pg_get_serial_sequence('projects_tags', 'id'), 1, false) FROM projects_tags"
+  );
+  await db.query('DELETE FROM projects_tags');
 
-  await db.query("SELECT setval(pg_get_serial_sequence('project_likes', 'id'), 1, false) FROM project_likes");
-  await db.query("DELETE FROM project_likes");
+  // reset database id sequence on tags and delete tags
 
-  await db.query("SELECT setval(pg_get_serial_sequence('project_comments', 'id'), 1, false) FROM project_comments");
-  await db.query("DELETE FROM project_comments");
+  await db.query(
+    "SELECT setval(pg_get_serial_sequence('tags', 'id'), 1, false) FROM tags"
+  );
+  await db.query('DELETE FROM tags');
+
+  // reset database id sequence on project_likes and delete project_likes
+  await db.query(
+    "SELECT setval(pg_get_serial_sequence('project_likes', 'id'), 1, false) FROM project_likes"
+  );
+  await db.query('DELETE FROM project_likes');
+
+  // reset database id sequence on comments and delete comments
+  await db.query(
+    "SELECT setval(pg_get_serial_sequence('project_comments', 'id'), 1, false) FROM project_comments"
+  );
+  await db.query('DELETE FROM project_comments');
 
   // create test users
   await db.query(
@@ -112,7 +135,8 @@ async function commonBeforeAll() {
   );
 
   const p1Like = projectLike1.rows[0];
-  console.log(p1Like);
+  console.log('PROJECTLIKE1', projectLike1, 'P1LIKE: ', p1Like);
+
   // create test project 2 separately so it will hopefully have a different creation timestamp
   const project2 = await db.query(`
   INSERT INTO projects(
@@ -136,6 +160,7 @@ async function commonBeforeAll() {
   const p1 = project1.rows.filter((p) => p.id === 1);
   const p1Tags = await Project_Tag.create(1, [3, 4]);
   p1.tags = p1Tags;
+  p1.likes = [p1Like];
 
   const p2 = project2.rows.filter((p) => p.id === 2);
   const p2Tags = await Project_Tag.create(2, [1, 2, 4]);

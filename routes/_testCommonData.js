@@ -64,6 +64,16 @@ const p2Data = {
   siteUrl: 'https://debrakayeelliott.com/',
 };
 
+const l1Data = {
+  likerId: 1,
+  projectId: 1,
+};
+
+const l2Data = {
+  likerId: 3,
+  projectId: 1,
+};
+
 const c1Data = {
   projectId: 1,
   commenterId: 2,
@@ -79,6 +89,8 @@ module.exports = {
   adminData,
   p1Data,
   p2Data,
+  l1Data,
+  l2Data,
   c1Data,
   pt1Data,
   pt2Data,

@@ -43,8 +43,42 @@ const badJwt = jwt.sign(
   'not-secret-key'
 );
 
-describe("authenticateJWT", function() {
-  test("works when valid token passed via header", function() {
+const {
+  commonBeforeAll,
+  commonBeforeEach,
+  commonAfterEach,
+  commonAfterAll,
+  u1,
+  u2,
+  admin,
+  p1,
+  p2,
+  l1,
+  l2,
+  u1Token,
+  u2Token,
+  adminToken,
+} = require('../routes/_testCommon');
+
+beforeAll(commonBeforeAll);
+beforeEach(commonBeforeEach);
+afterEach(commonAfterEach);
+// afterAll(commonAfterAll);
+
+// const {
+//   commonBeforeAll,
+//   commonBeforeEach,
+//   commonAfterEach,
+//   commonAfterAll,
+// } = require('../models/_testCommon');
+
+// beforeAll(commonBeforeAll);
+// beforeEach(commonBeforeEach);
+// afterEach(commonAfterEach);
+// // commonAfterAll(commonAfterAll);
+
+describe('authenticateJWT', function () {
+  test('works when valid token passed via header', function () {
     expect.assertions(2);
     const req = { headers: { authorization: `Bearer ${testJwt}` } };
     const res = {};
@@ -206,42 +240,46 @@ describe('ensureCorrectUserOrAdminLikes', function () {
     ensureCorrectUserOrAdminLikes(req, res, next);
   });
 
-  test("it works when same user", function() {
-    expect.assertions(1);
-    const req = { 
-      user: { id: 1, username: "test", isAdmin: false },
-      body: { userId: "1" }
-    };
-    const res = {};
-    const next = function (err) {
-      expect(err).toBeFalsy();
-    };
-    ensureCorrectUserOrAdminBody(req, res, next);
-  });
+  // test('it works when same user', function () {
+  //   expect.assertions(1);
+  //   const req = {
+  //     user: { id: 1, username: 'test', isAdmin: false },
+  //     // body: { userId: '1' },
+  //     body: { projectId: 1, currentUsersLikeId: 22 },
+  //   };
+  //   const res = {};
+  //   const next = function (err) {
+  //     expect(err).toBeFalsy();
+  //   };
+  //   ensureCorrectUserOrAdminLikes(req, res, next);
+  // });
 
-  test("it works when users are mismatched", function() {
-    expect.assertions(1);
-    const req = { 
-      user: { id: 1, username: "test", isAdmin: false },
-      body: { userId: "999" }
-    };
-    const res = {};
-    const next = function (err) {
-      expect(err instanceof UnauthorizedError).toBeTruthy();
-    };
-    ensureCorrectUserOrAdminBody(req, res, next);
-  });
+  // test('it works when users are mismatched', function () {
+  //   expect.assertions(1);
+  //   const req = {
+  //     user: { id: 1, username: 'test', isAdmin: false },
+  //     body: { userId: '999' },
+  //   };
+  //   const res = {};
+  //   const next = function (err) {
+  //     expect(err instanceof UnauthorizedError).toBeTruthy();
+  //   };
+  //   ensureCorrectUserOrAdminLikes(req, res, next);
+  // });
 
-  test("it works if user is anonymous", function() {
-    expect.assertions(1);
-    const req = {
-      body: { userId: "1" }
-    };
-    const res = {};
-    const next = function (err) {
-      expect(err instanceof UnauthorizedError).toBeTruthy();
-    };
-    ensureCorrectUserOrAdminBody(req, res, next);
-  });
+  // test('it works if user is anonymous', function () {
+  //   expect.assertions(1);
+  //   const req = {
+  //     body: { userId: '1' },
+  //   };
+  //   const res = {};
+  //   const next = function (err) {
+  //     expect(err instanceof UnauthorizedError).toBeTruthy();
+  //   };
+  //   ensureCorrectUserOrAdminLikes(req, res, next);
+  // });
 });
 
+// describe('ensureCorrectUserOrAdminComments', function () {
+
+// });
