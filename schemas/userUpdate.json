@@ -47,7 +47,7 @@
 		},
 		"email": {
 			"$id": "#/properties/email",
-			"type": "string",
+			"type": ["string", "null"],
 			"title": "The email schema",
 			"description": "An explanation about the purpose of this instance.",
 			"default": "",
@@ -56,7 +56,7 @@
 		},
 		"bio": {
 			"$id": "#/properties/bio",
-			"type": "string",
+			"type": ["string", "null"],
 			"title": "The bio schema",
 			"description": "An explanation about the purpose of this instance.",
 			"default": "",
@@ -66,7 +66,7 @@
 		},
 		"portfolioUrl": {
 			"$id": "#/properties/portfolioUrl",
-			"type": "string",
+			"type": ["string", "null"],
 			"title": "The portfolioUrl schema",
 			"description": "An explanation about the purpose of this instance.",
 			"default": "",
@@ -76,7 +76,7 @@
 		},
 		"gitHubUrl": {
 			"$id": "#/properties/gitHubUrl",
-			"type": "string",
+			"type": ["string", "null"],
 			"title": "The gitHubUrl schema",
 			"description": "An explanation about the purpose of this instance.",
 			"default": "",
