@@ -42,6 +42,38 @@ class Project_Like {
     return like;
   }
 
+  /** Purpose: to get a like
+   *
+   * Input: id
+   *
+   * Returns:
+   *
+   * Error(s):
+   *
+   */
+
+  static async getOne(id) {
+    const query = `
+      SELECT 
+        id AS "likeId",
+        liker_id AS "likerId",
+        project_id AS "projectId"
+      FROM project_likes
+      WHERE id = $1
+    `;
+
+    const result = await db.query(query, [id]);
+    console.log('RESULT.rows FROM PROJECT_LIKE MODEL: ', result.rows);
+    console.log(
+      'LIKERID: ',
+      result.rows[0].likerId,
+      'TYPEOF RESULT.ROWS[0].LIKERID: ',
+      typeof result.rows[0].likerId
+    );
+    const like = result.rows[0];
+
+    if (!like) throw new NotFoundError(`No like found with id ${id}`);
+
     return like;
   }
 
