@@ -16,8 +16,6 @@ class Project_Tag {
 	 *       { projectId, tagId }
 	 *     ]
 	 *   }
-	 *
-	 * Error(s):
 	 */
 
 	static async create(projectId, tags) {

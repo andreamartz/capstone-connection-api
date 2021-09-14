@@ -37,7 +37,6 @@ class Project {
 	 *        ]
 	 *     },
 	 *   }
-	 * Error(s):
 	 */
 
 	static async create(data) {
@@ -109,7 +108,6 @@ class Project {
 	 *     ]
 	 *   }
 	 *
-	 * Error(s):
 	 */
 
 	static async getAll(currentUserId, filterParams = {}) {
@@ -244,7 +242,6 @@ class Project {
 	 *     }
 	 *   }
 	 *
-	 *  Error(s):
 	 */
 
 	static async getOne(currentUserId, id) {
@@ -422,7 +419,6 @@ class Project {
 	 *     }
 	 *   }
 	 *
-	 *  Error(s):
 	 */
 
 	static async remove(id) {
