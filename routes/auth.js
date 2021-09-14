@@ -49,7 +49,7 @@ router.post('/token', async function (req, res, next) {
  * Authorization required: none
  */
 
-router.get('/register/demo', async function (req, res, next) {
+router.post('/register/demo', async function (req, res, next) {
 	console.debug('REGISTER A DEMO USER');
 	try {
 		// Check for demo user in database
@@ -69,8 +69,8 @@ router.get('/register/demo', async function (req, res, next) {
 		const demoUserData = {
 			username: 'demouser',
 			password: 'demopassword',
-			firstName: 'Demo',
-			lastName: 'User',
+			firstName: 'DemoUser',
+			lastName: 'DemoUser',
 			email: 'demo@email.com',
 			bio: 'I am Demo User. This is my bio.',
 			photoUrl: photoUrl,
