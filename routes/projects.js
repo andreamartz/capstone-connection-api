@@ -9,6 +9,7 @@ const { BadRequestError } = require('../expressError');
 const {
 	ensureLoggedIn,
 	ensureCorrectUserOrAdminLikes,
+	ensureCorrectUserOrAdminProjects,
 } = require('../middleware/auth');
 const imageUpload = require('../helpers/imageUpload');
 const Project = require('../models/project');
@@ -67,6 +68,33 @@ router.post('/', ensureLoggedIn, async function (req, res, next) {
 		return next(error);
 	}
 });
+
+/** DELETE /:id
+ *
+ * Purpose: delete a project
+ *
+ * Req body: { id }
+ *
+ * Returns: { deleted: id }
+ *
+ * Auth required: Must be the project creator OR an admin
+ *
+ * Errors:
+ */
+
+router.delete(
+	'/:id',
+	ensureCorrectUserOrAdminProjects,
+	async function (req, res, next) {
+		try {
+			const { id } = req.params;
+			const project = await Project.remove(id);
+			return res.json({ deleted: id });
+		} catch (err) {
+			return next(err);
+		}
+	},
+);
 
 /** POST /:id/likes
  *
