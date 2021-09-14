@@ -37,7 +37,7 @@ class Project_Comment {
 	 *
 	 * Input: id
 	 *
-	 * Returns:
+	 * Returns: { commentId, commenterId, projectId, comment, createdAt, lastModified }
 	 *
 	 * Error(s): throws NotFoundError if comment not found
 	 */
@@ -45,12 +45,12 @@ class Project_Comment {
 	static async getOne(id) {
 		const query = `
       SELECT
-        id AS commentId,
-        commenter_id AS commenterId,
-        project_id AS projectId,
+        id AS "commentId",
+        commenter_id AS "commenterId",
+        project_id AS "projectId",
         comment,
-        created_at AS createdAt,
-        last_modified AS lastModified
+        created_at AS "createdAt",
+        last_modified AS "lastModified"
       FROM project_comments
       WHERE id = $1
     `;
