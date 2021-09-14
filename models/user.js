@@ -204,16 +204,6 @@ class User {
 			throw new BadRequestError('No user id was provided.');
 		}
 
-		// const queryUserId = `
-		//   SELECT
-		//     id,
-		//     username
-		//   FROM users
-		//   WHERE id = $1
-		// `;
-
-		// const userIdQueryRes = await db.query(queryUserId, [userId]);
-
 		const query = `
       SELECT 
         u.id,
