@@ -13,7 +13,7 @@ class Project_Like {
 	 *   projectId
 	 * }
 	 *
-	 * Returns:
+	 * Returns: { likerId, projectId }
 	 *
 	 * Errors(s):
 	 */
@@ -35,13 +35,35 @@ class Project_Like {
 		return like;
 	}
 
+	/** Purpose: Get all likes
+	 *
+	 * Input: none
+	 *
+	 * Returns: [{ likeId, likerId, projectId }, ... ]
+	 */
+
+	static async getAll() {
+		const query = `
+      SELECT 
+        id AS "likeId",
+        liker_id AS "likerId",
+        project_id AS "projectId"
+      FROM project_likes
+		`;
+
+		const results = await db.query(query);
+		const likes = results.rows;
+
+		if (!likes) throw new NotFoundError(`No likes found`);
+
+		return likes;
+	}
+
 	/** Purpose: to get a like
 	 *
 	 * Input: id
 	 *
-	 * Returns:
-	 *
-	 * Error(s):
+	 * Returns: { likeId, likerId, projectId }
 	 *
 	 */
 
