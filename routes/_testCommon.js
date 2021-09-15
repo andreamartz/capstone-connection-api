@@ -3,8 +3,6 @@
 process.env.NODE_ENV = 'test'; // must come before import of db.js
 
 const db = require('../db.js');
-const request = require('supertest');
-const app = require('../app');
 const {
 	u1Data,
 	u2Data,
@@ -14,10 +12,7 @@ const {
 	l2Data,
 	c1Data,
 	adminData,
-	pt1Data,
-	pt2Data,
 } = require('./_testCommonData');
-const { BCRYPT_WORK_FACTOR, DB_URI } = require('../config');
 const User = require('../models/user');
 const Project = require('../models/project');
 const Tag = require('../models/tag');
