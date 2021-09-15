@@ -26,58 +26,60 @@ const Project_Like = require('../models/project_like');
 const Project_Tag = require('../models/project_tag');
 const createToken = require('../helpers/tokens');
 
-let u1, u2, admin;
+let user1, user2, adminUser, u1Token, u2Token, adminToken;
+let user1Sparse, user2Sparse, adminUserSparse;
+let project1, project2;
+let likes;
 let p1, p2;
 let c1;
 let l1, l2;
 let t1, t2, t3, t4;
 let pt1, pt2;
 
-async function commonBeforeAll() {
-	console.log('INSIDE commonBeforeAll, DB_URI: ', DB_URI);
-
-	// reset database id sequence on project_likes and delete project_likes
-	const likesQuery = `SELECT setval(pg_get_serial_sequence('project_likes', 'id'), 1, false) FROM project_likes`;
-	await db.query(likesQuery);
-	await db.query('DELETE FROM project_likes');
-
+async function commonBeforeEach() {
 	/**
-	 * reset database id sequence on projects and delete projects
+	 * reset primary key sequence on projects
 	 * this must come before doing the same for users;
 	 */
 	await db.query(
 		"SELECT setval(pg_get_serial_sequence('projects', 'id'), 1, false) FROM projects",
 	);
-	await db.query('DELETE FROM projects');
 
-	// reset database id sequence on users and delete users
+	// reset primary key sequence on users
 	await db.query(
 		"SELECT setval(pg_get_serial_sequence('users', 'id'), 1, false) FROM users",
 	);
-	await db.query('DELETE FROM users');
 
-	// reset database id sequence on projects_tags join table and delete projects_tags
+	// reset primary key sequence on projects_tags join table
 	await db.query(
 		"SELECT setval(pg_get_serial_sequence('projects_tags', 'id'), 1, false) FROM projects_tags",
 	);
-	await db.query('DELETE FROM projects_tags');
 
-	// reset database id sequence on tags and delete tags
+	// reset primary key sequence on tags
 	await db.query(
 		"SELECT setval(pg_get_serial_sequence('tags', 'id'), 1, false) FROM tags",
 	);
-	await db.query('DELETE FROM tags');
 
-	// reset database id sequence on comments and delete comments
-
+	// reset primary key sequence on comments
 	await db.query(
 		"SELECT setval(pg_get_serial_sequence('project_comments', 'id'), 1, false) FROM project_comments",
 	);
-	await db.query('DELETE FROM project_comments');
 
-	u1 = await User.register(u1Data);
-	u2 = await User.register(u2Data);
-	admin = await User.register(adminData);
+	// reset primary key sequence on project_likes
+	await db.query(
+		"SELECT setval(pg_get_serial_sequence('project_likes', 'id'), 1, false) FROM project_likes",
+	);
+
+	await db.query('DELETE FROM projects');
+	await db.query('DELETE FROM users');
+	await db.query('DELETE FROM projects_tags');
+	await db.query('DELETE FROM tags');
+	await db.query('DELETE FROM project_comments');
+	await db.query('DELETE FROM project_likes');
+
+	user1 = await User.register(u1Data);
+	user2 = await User.register(u2Data);
+	adminUser = await User.register(adminData);
 
 	t1 = await Tag.create({ text: 'HTML' });
 	t2 = await Tag.create({ text: 'CSS' });
@@ -95,13 +97,18 @@ async function commonBeforeAll() {
 	pt1 = await Project_Tag.create(1, p1Data.tags);
 	pt2 = await Project_Tag.create(2, p2Data.tags);
 
-	const project1 = await Project.getOne(1, 1);
+	user1Sparse = await User.getOneByUsername(u1Data.username);
+	user1 = await User.getOne(user1Sparse.id);
 
-	console.log('P1: ', p1, 'P1.rows: ', p1.rows, 'PROJECT1: ', project1);
-}
+	user2Sparse = await User.getOneByUsername(u2Data.username);
+	user2 = await User.getOne(user2Sparse.id);
 
-async function commonBeforeEach() {
-	await db.query('BEGIN');
+	adminUserSparse = await User.getOneByUsername(adminData.username);
+	adminUser = await User.getOne(adminUserSparse.id);
+
+	project1 = await Project.getOne(1, 1);
+	project2 = await Project.getOne(1, 2);
+	likes = await Project_Like.getAll();
 }
 
 async function commonAfterEach() {
@@ -112,22 +119,24 @@ async function commonAfterAll() {
 	await db.end();
 }
 
-const u1Token = createToken({ u1 });
-const u2Token = createToken({ u2 });
-const adminToken = createToken(adminData);
+u1Token = createToken({ u1Data });
+u2Token = createToken({ u2Data });
+adminToken = createToken(adminData);
 
 module.exports = {
-	commonBeforeAll,
 	commonBeforeEach,
 	commonAfterEach,
 	commonAfterAll,
-	u1,
-	u2,
-	admin,
 	p1,
 	p2,
 	l1,
 	l2,
+	user1,
+	user2,
+	adminUser,
+	project1,
+	project2,
+	likes,
 	u1Token,
 	u2Token,
 	adminToken,
