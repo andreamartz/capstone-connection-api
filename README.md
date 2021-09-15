@@ -26,18 +26,20 @@ For all other requests, pass along the token in body of request along with any o
 
 ### auth
 
-- `POST "/auth/register"` No auth necessary. Creates
+- `POST "/auth/register/demo"` No auth necessary. Deletes any previous demo account (and all of its associated data) and creates a new one.
+- `POST "/auth/register"` No auth necessary. Creates a new account
 - `POST "/auth/token"` No auth necessary. Verifies that the user exists and that the correct password was used. Creates a token for user.
 
 ### users
 
 - `GET "/users/:id"` User must be logged in. Get a specific user.
-- `GET "/users/:id/projects"` User must be logged in. Get a a list of projects for the user with that id.
-- `PATCH "/users/:id"` User must be the one with the id specified in the path. Updates the user's info.
+- `GET "/users/:id/projects"` User must be logged in. Get a list of projects for the user with that id.
+- `PATCH "/users/:id"` User must be an admin or the one with the id specified in the path. Updates the user's info.
 
 ### projects
 
 - `POST "/projects"` User must be logged in. Create a new project.
+- `DELETE "/projects/:id"` User must be an admin or the correct user. Removes a project from the database permanently.
 - `POST "/projects/:id/likes"` User must be logged in. Add a like to a project.
 - `POST "/projects/:id/tags"` User must be an admin or the correct user. Add a tag to a project.
 - `GET "/projects"` User must be logged in. Get all projects. By passing in optional data, the projects can be filtered or sorted.
@@ -52,4 +54,4 @@ For all other requests, pass along the token in body of request along with any o
 ### project_comments
 
 `POST "/project_comments"` User must be logged in. Post a comment to a project to give feedback.
-`PATCH "/project_comments"` User must be an admin or the correct user. Change data pertaining to a project.
+`PATCH "/project_comments"` User must be an admin or the correct user. Edit a previously posted comment.
