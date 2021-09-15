@@ -73,6 +73,7 @@ const projectsSqlToExpress = (results, currentUserId) => {
 					lastModified,
 					prjCommentsCount: +prjCommentsCount,
 					likesCount: +prjLikesCount,
+					likes: [],
 				};
 
 				// Store project creator data in an object
