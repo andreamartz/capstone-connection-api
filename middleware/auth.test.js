@@ -199,13 +199,14 @@ describe('ensureCorrectUserOrAdminParams', function () {
 	});
 });
 
+/** ensureCorrectUserOrAdminLikes */
 describe('ensureCorrectUserOrAdminLikes', function () {
 	test('it works when user is an admin', function () {
-		const { id, username, isAdmin } = jwt.decode(u1Token);
+		const payload = jwt.decode(adminToken);
 		const wrongUsersLikeId = 1;
 		expect.assertions(1);
 		const req = {
-			user: { id, username, isAdmin },
+			user: { id: 3, username: 'admin', isAdmin: true },
 			body: { projectId: 1, currentUsersLikeId: wrongUsersLikeId },
 		};
 		const res = {};
@@ -215,46 +216,105 @@ describe('ensureCorrectUserOrAdminLikes', function () {
 		ensureCorrectUserOrAdminLikes(req, res, next);
 	});
 
-	// test('it works when same user', function () {
-	//   expect.assertions(1);
-	//   const req = {
-	//     user: { id: 1, username: 'test', isAdmin: false },
-	//     // body: { userId: '1' },
-	//     body: { projectId: 1, currentUsersLikeId: 22 },
-	//   };
-	//   const res = {};
-	//   const next = function (err) {
-	//     expect(err).toBeFalsy();
-	//   };
-	//   ensureCorrectUserOrAdminLikes(req, res, next);
-	// });
+	test('it works when same user', function () {
+		const usersLikeId = 1;
+		expect.assertions(1);
+		const req = {
+			user: { id: 1, username: 'u1', isAdmin: false },
+			body: { projectId: 1, currentUsersLikeId: 1 },
+		};
+		const res = {};
+		const next = function (err) {
+			expect(err).toBeFalsy();
+		};
+		ensureCorrectUserOrAdminLikes(req, res, next);
+	});
 
-	// test('it works when users are mismatched', function () {
-	//   expect.assertions(1);
-	//   const req = {
-	//     user: { id: 1, username: 'test', isAdmin: false },
-	//     body: { userId: '999' },
-	//   };
-	//   const res = {};
-	//   const next = function (err) {
-	//     expect(err instanceof UnauthorizedError).toBeTruthy();
-	//   };
-	//   ensureCorrectUserOrAdminLikes(req, res, next);
-	// });
+	test('it works when users are mismatched', function () {
+		expect.assertions(1);
+		const req = {
+			user: { id: 1, username: 'u1', isAdmin: false },
+			body: { projectId: 1, currentUsersLikeId: '2' },
+		};
+		const res = {};
+		const next = function (err) {
+			expect(err instanceof UnauthorizedError).toBeTruthy();
+		};
+		ensureCorrectUserOrAdminLikes(req, res, next);
+	});
 
-	// test('it works if user is anonymous', function () {
-	//   expect.assertions(1);
-	//   const req = {
-	//     body: { userId: '1' },
-	//   };
-	//   const res = {};
-	//   const next = function (err) {
-	//     expect(err instanceof UnauthorizedError).toBeTruthy();
-	//   };
-	//   ensureCorrectUserOrAdminLikes(req, res, next);
-	// });
+	test('it works if user is anonymous', function () {
+		expect.assertions(1);
+		const req = {
+			body: { projectId: 1, currentUsersLikeId: '1' },
+		};
+		const res = {};
+		const next = function (err) {
+			expect(err instanceof UnauthorizedError).toBeTruthy();
+		};
+		ensureCorrectUserOrAdminLikes(req, res, next);
+	});
 });
 
-// describe('ensureCorrectUserOrAdminComments', function () {
+/** ensureCorrectUserOrAdminComments */
 
-// });
+describe('ensureCorrectUserOrAdminComments', function () {
+	test('it works when user is an admin', function () {
+		const nonAdminsCommentId = 1;
+		expect.assertions(1);
+		const req = {
+			user: { id: 3, username: 'admin', isAdmin: true },
+			params: { id: nonAdminsCommentId },
+			body: { projectId: 1, userId: 3, comment: 'New comment' },
+		};
+		const res = {};
+		const next = function (err) {
+			expect(err).toBeFalsy();
+		};
+		ensureCorrectUserOrAdminComments(req, res, next);
+	});
+
+	test('it works when same user', function () {
+		const commentId = 1;
+		expect.assertions(1);
+		const req = {
+			user: { id: 2, username: 'u2', isAdmin: false },
+			params: { id: commentId },
+			body: { projectId: 1, userId: 2, comment: 'New comment' },
+		};
+		const res = {};
+		const next = function (err) {
+			expect(err).toBeFalsy();
+		};
+		ensureCorrectUserOrAdminComments(req, res, next);
+	});
+
+	test('it works when users are mismatched', function () {
+		const commentId = 1;
+		expect.assertions(1);
+		const req = {
+			user: { id: 1, username: 'u1', isAdmin: false },
+			params: { id: commentId },
+			body: { projectId: 1, userId: 1, comment: 'New comment' },
+		};
+		const res = {};
+		const next = function (err) {
+			expect(err instanceof UnauthorizedError).toBeTruthy();
+		};
+		ensureCorrectUserOrAdminComments(req, res, next);
+	});
+
+	test('it works if user is anonymous', function () {
+		const commentId = 1;
+		expect.assertions(1);
+		const req = {
+			params: { id: commentId },
+			body: { projectId: 1, comment: 'New comment' },
+		};
+		const res = {};
+		const next = function (err) {
+			expect(err instanceof UnauthorizedError).toBeTruthy();
+		};
+		ensureCorrectUserOrAdminComments(req, res, next);
+	});
+});

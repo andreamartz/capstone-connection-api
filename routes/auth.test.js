@@ -49,7 +49,7 @@ describe('POST /auth/token', function () {
 	test('bad request with invalid data', async function () {
 		const resp = await request(app).post('/auth/token').send({
 			username: 42,
-			password: 'above-is-a-number',
+			password: 'aboveIsANumber',
 		});
 		expect(resp.statusCode).toEqual(400);
 	});
