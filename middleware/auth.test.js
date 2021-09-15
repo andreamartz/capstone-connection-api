@@ -44,38 +44,13 @@ const badJwt = jwt.sign(
 );
 
 const {
-	commonBeforeAll,
 	commonBeforeEach,
 	commonAfterEach,
-	commonAfterAll,
-	u1,
-	u2,
-	admin,
-	p1,
-	p2,
-	l1,
-	l2,
-	u1Token,
-	u2Token,
 	adminToken,
 } = require('../routes/_testCommon');
 
-beforeAll(commonBeforeAll);
 beforeEach(commonBeforeEach);
 afterEach(commonAfterEach);
-// afterAll(commonAfterAll);
-
-// const {
-//   commonBeforeAll,
-//   commonBeforeEach,
-//   commonAfterEach,
-//   commonAfterAll,
-// } = require('../models/_testCommon');
-
-// beforeAll(commonBeforeAll);
-// beforeEach(commonBeforeEach);
-// afterEach(commonAfterEach);
-// // commonAfterAll(commonAfterAll);
 
 describe('authenticateJWT', function () {
 	test('works when valid token passed via header', function () {

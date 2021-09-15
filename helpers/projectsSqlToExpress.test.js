@@ -102,7 +102,6 @@ describe('Test the function projectsSqlToExpress', function () {
 		const projects = projectsSqlToExpress(data, currentUserId);
 		expect(projects.length).toEqual(2);
 		expect(projects[0].tags.length).toEqual(2);
-		console.log('PROJECTS: ', projects);
 		expect(projects[1].tags.length).toEqual(2);
 	});
 });

@@ -4,20 +4,10 @@ const request = require('supertest');
 
 const app = require('../app');
 
-const {
-	commonBeforeAll,
-	commonBeforeEach,
-	commonAfterEach,
-	commonAfterAll,
-	u1Token,
-	u2Token,
-	adminToken,
-} = require('./_testCommon');
+const { commonBeforeEach, commonAfterEach } = require('./_testCommon');
 
-beforeAll(commonBeforeAll);
 beforeEach(commonBeforeEach);
 afterEach(commonAfterEach);
-afterAll(commonAfterAll);
 
 /*********** POST /auth/token ***********/
 
@@ -52,6 +42,7 @@ describe('POST /auth/token', function () {
 		const resp = await request(app).post('/auth/token').send({
 			username: 'u1',
 		});
+		console.log('STATUS CODE: ', resp.statusCode);
 		expect(resp.statusCode).toEqual(400);
 	});
 

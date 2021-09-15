@@ -3,23 +3,17 @@
 
 process.env.NODE_ENV = 'test'; // must come before loading db.js
 
-const request = require('supertest');
-const app = require('../app');
-const db = require('../db');
-const config = require('../config');
 const Project = require('./project');
 
 const {
 	commonBeforeAll,
 	commonBeforeEach,
 	commonAfterEach,
-	commonAfterAll,
 } = require('./_testCommon');
 
 beforeAll(commonBeforeAll);
 beforeEach(commonBeforeEach);
 afterEach(commonAfterEach);
-// commonAfterAll(commonAfterAll);
 
 /**************** getAll ****************/
 describe('getAll', function () {

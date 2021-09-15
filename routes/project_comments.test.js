@@ -5,20 +5,10 @@ process.env.NODE_ENV = 'test';
 const request = require('supertest');
 const app = require('../app');
 
-const {
-	commonBeforeAll,
-	commonBeforeEach,
-	commonAfterEach,
-	commonAfterAll,
-	u1Token,
-	u2Token,
-	adminToken,
-} = require('./_testCommon');
+const { commonBeforeEach, commonAfterEach, u1Token } = require('./_testCommon');
 
-beforeAll(commonBeforeAll);
 beforeEach(commonBeforeEach);
 afterEach(commonAfterEach);
-afterAll(commonAfterAll);
 
 /***************** POST /project_comments **************/
 
@@ -44,6 +34,5 @@ describe('POST /project_comments', function () {
 			.send(newComment)
 			.set('authorization', `Bearer ${u1Token}`);
 		expect(response.statusCode).toEqual(201);
-		// expect(response.body).toEqual(addedComment);
 	});
 });

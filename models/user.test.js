@@ -13,13 +13,11 @@ const {
 	commonBeforeAll,
 	commonBeforeEach,
 	commonAfterEach,
-	// commonAfterAll
 } = require('./_testCommon');
 
 beforeAll(commonBeforeAll);
 beforeEach(commonBeforeEach);
 afterEach(commonAfterEach);
-// commonAfterAll(commonAfterAll);
 
 /**************** authenticate ****************/
 describe('authenticate', function () {
