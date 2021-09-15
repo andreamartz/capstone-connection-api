@@ -30,11 +30,12 @@ const router = new express.Router();
  *
  * Req body:  { project }
  *
- * Returns:
+ * Returns: { project: {...} }
+ * - see model for details
  *
  * Auth required: User must be logged in
  *
- * Errors:
+ * Errors: BadRequestError if req.body data does not validate
  */
 router.post('/', ensureLoggedIn, async function (req, res, next) {
 	console.debug('CREATE NEW PRJ');
@@ -104,9 +105,7 @@ router.delete(
  *
  * Returns: { id, likerId, projectId }
  *
- * Auth required:
- *
- * Errors:
+ * Auth required: User must be logged in
  */
 router.post('/:id/likes', ensureLoggedIn, async function (req, res, next) {
 	try {
@@ -136,9 +135,7 @@ router.post('/:id/likes', ensureLoggedIn, async function (req, res, next) {
  *     ]
  *   }
  *
- * Auth required:
- *
- * Errors:
+ * Auth required: User must be logged in
  */
 
 router.post('/:id/tags', ensureLoggedIn, async function (req, res, next) {
@@ -164,11 +161,11 @@ router.post('/:id/tags', ensureLoggedIn, async function (req, res, next) {
  *  - userId
  *  - tagName
  *
- * Returns:
+ * Returns: array of project objects (see model for details)
  *
- * Auth required:
+ * Auth required: User must be logged in
  *
- * Errors:
+ * Errors: BadRequestError if search or sort criteria does not validate
  */
 
 router.get('/', ensureLoggedIn, async function (req, res, next) {
@@ -200,11 +197,9 @@ router.get('/', ensureLoggedIn, async function (req, res, next) {
  *
  * Req body: none
  *
- * Returns:
+ * Returns: project object (see model for details)
  *
- * Auth required:
- *
- * Errors:
+ * Auth required: User must be logged in
  */
 
 router.get('/:id', ensureLoggedIn, async function (req, res, next) {
@@ -226,8 +221,6 @@ router.get('/:id', ensureLoggedIn, async function (req, res, next) {
  * Returns: { deleted: currentUsersLikeId }
  *
  * Auth required: Must be a user who has already liked the project OR an admin
- *
- * Errors:
  */
 
 router.delete(
