@@ -2,7 +2,7 @@
 
 const _ = require('lodash');
 
-/** fromDbToExpress
+/** projectsSqlToExpress
  *
  *  Input: array of project objects with lots of duplicated info
  *
@@ -16,7 +16,7 @@ const _ = require('lodash');
  *   * Most of the data in each project array is duplicated in each project object.
  *   *This happens because there can be multiple tags, multiple comments, and multiple likes associated with a single project.
  *
- * Purpose: fromDbToExpress reduces each project array down to a single object and pushes it onto a new array, called 'projects', which is returned from the function.
+ * Purpose: projectsSqlToExpress reduces each project array down to a single object and pushes it onto a new array, called 'projects', which is returned from the function.
  *
  * Returns: an array of individual project objects
  */
